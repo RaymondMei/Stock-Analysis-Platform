@@ -1,0 +1,34 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container mt-5">
+	<h1 class="text-center mb-4">Daily Stock Price</h1>
+	<div class="alert alert-info text-center" role="alert">
+		Fetch daily stock prices for a specific stock symbol (e.g., AAPL) over the
+		past 2 years
+	</div>
+	<form action="getstockdata" method="GET" class="needs-validation" novalidate>
+		{% csrf_token %}
+		<div class="row mb-3">
+			<div class="col-md-6 offset-md-3">
+				<div class="form-floating">
+					<input
+						type="text"
+						class="form-control"
+						name="stock-symbol"
+						id="stock-symbol"
+						placeholder="AAPL"
+						autocomplete="off"
+						required
+					/>
+					<label for="stock-symbol">Stock Symbol</label>
+					<div class="invalid-feedback">Please enter a stock symbol.</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6 offset-md-3 text-center">
+				<button type="submit" class="btn btn-success btn-lg">Search</button>
+			</div>
+		</div>
+	</form>
+</div>
+{% endblock %}

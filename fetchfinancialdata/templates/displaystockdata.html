@@ -1,0 +1,47 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container-fluid mt-5">
+	<h1 class="text-center mb-4">{{ title }}</h1>
+	<div class="row">
+		<div class="col">
+			<h1>Backtest</h1>
+				<div class="form-group">
+					<label for="initialInvestment">Initial Investment</label>
+					<input type="number" class="form-control" id="initialInvestment" name="initialInvestment" required>
+				</div>
+				<div class="form-group">
+					<label for="buyPrice">Buy when price dips below moving average (e.g. 50-day average)</label>
+					<input type="number" class="form-control" id="buyPrice" name="buyPrice" required>
+				</div>
+				<div class="form-group">
+					<label for="sellPrice">Sell when price goes above moving average (e.g. 200-day average)</label>
+					<input type="number" class="form-control" id="sellPrice" name="sellPrice" required>
+				</div>
+				<button type="submit" class="btn btn-primary">Run Backtest</button>
+		</div>
+		<table class="table col">
+			<thead>
+				<tr>
+					<th scope="col">Date</th>
+					<th scope="col">Open</th>
+					<th scope="col">High</th>
+					<th scope="col">Low</th>
+					<th scope="col">Close</th>
+					<th scope="col">Volume</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% if data %}{% for k, v in data.items %}
+				<tr>
+					<td scope="row">{{ k }}</td>
+					<td scope="row">{{ v.open }}</td>
+					<td scope="row">{{ v.high }}</td>
+					<td scope="row">{{ v.high }}</td>
+					<td scope="row">{{ v.close }}</td>
+					<td scope="row">{{ v.volume }}</td>
+				</tr>
+				{% endfor %}{% endif %}
+			</tbody>
+		</table>
+	</div>
+</div>
+{% endblock %}
