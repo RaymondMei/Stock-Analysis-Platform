@@ -3,20 +3,23 @@
 	<h1 class="text-center mb-4">{{ title }}</h1>
 	<div class="row">
 		<div class="col">
-			<h1>Backtest</h1>
+			<form action="backtest" method="get">
+				{% csrf_token %}
+				<h1>Backtest</h1>
 				<div class="form-group">
-					<label for="initialInvestment">Initial Investment</label>
-					<input type="number" class="form-control" id="initialInvestment" name="initialInvestment" required>
+					<label for="initial-investment">Initial Investment</label>
+					<input type="number" class="form-control" id="initial-investment" name="initial-investment" required>
 				</div>
 				<div class="form-group">
-					<label for="buyPrice">Buy when price dips below moving average (e.g. 50-day average)</label>
-					<input type="number" class="form-control" id="buyPrice" name="buyPrice" required>
+					<label for="short-window">Buy when price dips below moving average (e.g. 50-day average)</label>
+					<input type="number" class="form-control" id="short-window" name="short-window" required>
 				</div>
 				<div class="form-group">
-					<label for="sellPrice">Sell when price goes above moving average (e.g. 200-day average)</label>
-					<input type="number" class="form-control" id="sellPrice" name="sellPrice" required>
+					<label for="long-window">Sell when price goes above moving average (e.g. 200-day average)</label>
+					<input type="number" class="form-control" id="long-window" name="long-window" required>
 				</div>
 				<button type="submit" class="btn btn-primary">Run Backtest</button>
+			</form>
 		</div>
 		<table class="table col">
 			<thead>
