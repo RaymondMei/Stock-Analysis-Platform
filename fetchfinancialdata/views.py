@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse, request
 from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 import requests
 from decouple import config
 import json
@@ -45,31 +47,62 @@ def backtest(request):
 		df = df.astype(float)
 		df.index = pd.to_datetime(df.index)
 		df = df.sort_index()
+		df['id'] = range(1, len(df)+1)
+		df[['id'] + [x for x in df.columns if x != 'id']]
+		df.set_index('id')
 
 		df['short_mavg'] = df['close'].rolling(window=short_window, min_periods=1).mean()
 		df['long_mavg'] = df['close'].rolling(window=long_window, min_periods=1).mean()
 
 		# Implement the trading strategy
-		df['signal'] = 0
-		df['signal'][short_window:] = np.where(df['short_mavg'][short_window:] > df['long_mavg'][short_window:], 1, 0)
+		df['signal'] = np.where(df['close'] > df['long_mavg'], 1, 0)
 		df['positions'] = df['signal'].diff()
+		df.at[df.index[0], 'positions'] = 0
+
+		prev_quantity = 0
+		prev_closing = initial_investment
+		for i, row in df.iterrows():
+
+			if row['positions'] == 1: # buy
+				new_quantity = prev_closing / row['close']
+				new_closing = 0
+			elif row['positions'] == -1: # sell
+				new_quantity = 0
+				new_closing = prev_quantity * row['close']
+			else:
+				new_quantity = prev_quantity
+				new_closing = prev_closing
+			
+			df.at[i, 'quantity'] = new_quantity
+			df.at[i, 'closing cash'] = new_closing
+			
+			prev_quantity = new_quantity
+			prev_closing = new_closing
 
 		# Backtest the strategy
-		portfolio = pd.DataFrame(index=df.index)
-		portfolio['holdings'] = df['close'] * df['signal']
-		portfolio['cash'] = initial_investment - (df['close'] * df['positions']).cumsum()
-		portfolio['total'] = portfolio['holdings'] + portfolio['cash']
-		portfolio['returns'] = portfolio['total'].pct_change()
+		# portfolio = pd.DataFrame(index=df.index)
+		# portfolio['holdings'] = df['close'] * df['signal']
+		# portfolio['cash'] = initial_investment - (df['close'] * df['positions']).cumsum()
+		# portfolio['total'] = portfolio['holdings'] + portfolio['cash']
+		# portfolio['returns'] = portfolio['total'].pct_change()
 
-		# Calculate performance metrics
-		total_return = portfolio['total'][-1] - initial_investment
-		max_drawdown = (portfolio['total'].cummax() - portfolio['total']).max()
-		num_trades = df['positions'].abs().sum()
+		# # Calculate performance metrics
+		# total_return = portfolio['total'][-1] - initial_investment
+		# max_drawdown = (portfolio['total'].cummax() - portfolio['total']).max()
+		# num_trades = df['positions'].abs().sum()
+
+		# performance_summary = {
+		# 	'total_return': total_return,
+		# 	'max_drawdown': max_drawdown,
+		# 	'num_trades': num_trades
+		# }
+
+		total_return = df['closing cash'].iloc[-1] + df['quantity'].iloc[-1] * df['close'].iloc[-1] - initial_investment
+
+		print(total_return)
 
 		performance_summary = {
-			'total_return': total_return,
-			'max_drawdown': max_drawdown,
-			'num_trades': num_trades
+			'total_return': total_return
 		}
 
-		return HttpResponse(performance_summary)
+		return Response(performance_summary, status=status.HTTP_200_OK)
