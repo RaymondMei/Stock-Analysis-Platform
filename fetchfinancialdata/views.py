@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, request
+from django.http import HttpResponse, request, JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -79,24 +79,6 @@ def backtest(request):
 			prev_quantity = new_quantity
 			prev_closing = new_closing
 
-		# Backtest the strategy
-		# portfolio = pd.DataFrame(index=df.index)
-		# portfolio['holdings'] = df['close'] * df['signal']
-		# portfolio['cash'] = initial_investment - (df['close'] * df['positions']).cumsum()
-		# portfolio['total'] = portfolio['holdings'] + portfolio['cash']
-		# portfolio['returns'] = portfolio['total'].pct_change()
-
-		# # Calculate performance metrics
-		# total_return = portfolio['total'][-1] - initial_investment
-		# max_drawdown = (portfolio['total'].cummax() - portfolio['total']).max()
-		# num_trades = df['positions'].abs().sum()
-
-		# performance_summary = {
-		# 	'total_return': total_return,
-		# 	'max_drawdown': max_drawdown,
-		# 	'num_trades': num_trades
-		# }
-
 		total_return = df['closing cash'].iloc[-1] + df['quantity'].iloc[-1] * df['close'].iloc[-1] - initial_investment
 
 		print(total_return)
@@ -105,4 +87,4 @@ def backtest(request):
 			'total_return': total_return
 		}
 
-		return Response(performance_summary, status=status.HTTP_200_OK)
+		return JsonResponse(performance_summary, status=status.HTTP_200_OK)
