@@ -38,9 +38,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+	# local apps
 	'fetchfinancialdata',
+	# installed apps
 	'corsheaders',
-	'rest_framework'
+	'rest_framework',
+	'graphene_django',
 	
 ]
 
