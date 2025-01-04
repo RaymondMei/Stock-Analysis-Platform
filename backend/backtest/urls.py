@@ -1,6 +1,7 @@
 from django.urls import path
-from .views import backtest
+from .views import simpleMovingAverage
 
 urlpatterns = [
-	path('backtest', view=backtest, name='backtest'),
+	# path('backtest', view=backtest, name='backtest'),
+	path('simplemovingaverage', view=simpleMovingAverage, name='simpleMovingAverage'),
 ]
