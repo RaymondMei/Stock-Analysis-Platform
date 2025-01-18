@@ -21,7 +21,7 @@ const FetchStockCard = ({
 				type="text"
 				value={ticker}
 				onChange={(e) => setTicker(e.target.value)}
-				placeholder="ticker"
+				placeholder="Ticker Symbol"
 			/>
 			<Button onClick={fetchStockData}>Search</Button>
 		</Card>

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 
 export interface StockTableCardProps {
-	stockData: StockData;
+	stockData?: StockData;
 }
 
 const StockTableCard = ({ stockData }: StockTableCardProps) => {
@@ -32,16 +32,27 @@ const StockTableCard = ({ stockData }: StockTableCardProps) => {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{Object.entries(stockData).map(([date, value]) => (
-							<TableRow key={date}>
-								<TableCell className="font-medium">{date}</TableCell>
-								<TableCell>{value.open}</TableCell>
-								<TableCell>{value.high}</TableCell>
-								<TableCell>{value.low}</TableCell>
-								<TableCell>{value.close}</TableCell>
-								<TableCell>{value.volume}</TableCell>
+						{stockData ? (
+							Object.entries(stockData).map(([date, value]) => (
+								<TableRow key={date}>
+									<TableCell className="font-medium">{date}</TableCell>
+									<TableCell>{value.open}</TableCell>
+									<TableCell>{value.high}</TableCell>
+									<TableCell>{value.low}</TableCell>
+									<TableCell>{value.close}</TableCell>
+									<TableCell>{value.volume}</TableCell>
+								</TableRow>
+							))
+						) : (
+							<TableRow>
+								<TableCell
+									colSpan={6}
+									className="h-24 text-center"
+								>
+									Error Fetching Data
+								</TableCell>
 							</TableRow>
-						))}
+						)}
 					</TableBody>
 				</Table>
 			</CardContent>

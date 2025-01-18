@@ -12,7 +12,7 @@ import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { StockData } from "@/App";
 
 export interface StockGraphCardProps {
-	stockData: StockData;
+	stockData?: StockData;
 }
 
 const StockGraphCard = ({ stockData }: StockGraphCardProps) => {
@@ -37,16 +37,14 @@ const StockGraphCard = ({ stockData }: StockGraphCardProps) => {
 
 	const parsedData = useMemo(() => {
 		if (!stockData) return [];
-		return Object.entries(stockData)
-			.reverse()
-			.map(([date, data]) => ({
-				date: new Date(date),
-				open: +data.open,
-				high: +data.high,
-				low: +data.low,
-				close: +data.close,
-				volume: +data.volume,
-			}));
+		return Object.entries(stockData).map(([date, data]) => ({
+			date: new Date(date),
+			open: +data.open,
+			high: +data.high,
+			low: +data.low,
+			close: +data.close,
+			volume: +data.volume,
+		}));
 	}, [stockData]);
 
 	// Use discontinuous time scale for x-axis
@@ -85,8 +83,8 @@ const StockGraphCard = ({ stockData }: StockGraphCardProps) => {
 					seriesName="Stock Data"
 				>
 					<Chart id={1} yExtents={(d) => [d.high, d.low]}>
-						<XAxis axisAt="bottom" orient="bottom" ticks={6} />
-						<YAxis axisAt="left" orient="left" ticks={5} />
+						<XAxis axisAt="bottom" orient="bottom" ticks={30} />
+						<YAxis axisAt="left" orient="left" ticks={10} showGridLines />
 						<CandlestickSeries />
 					</Chart>
 				</ChartCanvas>
