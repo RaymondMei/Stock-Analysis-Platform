@@ -798,12 +798,8 @@ function App() {
 
 	return (
 		<div className="grid grid-cols-4 grid-rows-12 gap-4 min-h-screen max-h-screen p-4">
-			{/* <Card className="col-span-1 row-span-8 grid gap-4 p-4"> */}
-				{/* <CardContent> */}
-					<FetchStockCard {...fetchStockCardProps} />
-					<BacktestCard {...backtestCardProps} />
-				{/* </CardContent> */}
-			{/* </Card> */}
+			<FetchStockCard {...fetchStockCardProps} />
+			<BacktestCard {...backtestCardProps} />
 			<StockGraphCard stockData={testStockData} />
 			<StockTableCard {...stockTableCardProps} />
 		</div>

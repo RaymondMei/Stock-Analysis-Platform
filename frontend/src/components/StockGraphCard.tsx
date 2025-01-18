@@ -19,7 +19,6 @@ const StockGraphCard = ({ stockData }: StockGraphCardProps) => {
 	const componentRef = useRef<HTMLHeadingElement>(null);
 	const [width, setWidth] = useState(0);
 	const [height, setHeight] = useState(0);
-	// const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
 	useLayoutEffect(() => {
 		setWidth(componentRef.current?.offsetWidth ?? 0);
