@@ -3,12 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardTitle } from "@/components/ui/card";
 import { BacktestResult } from "@/App";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
 import {
 	Dialog,
@@ -17,7 +12,9 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-  } from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
+
+import { Skeleton } from "@/components/ui/skeleton";
 
 export interface BacktestCardProps {
 	initialInvestment: number | undefined;
@@ -80,9 +77,9 @@ const BacktestCard = ({
 							<DialogTitle className="pb-3">Backtest Results</DialogTitle>
 							<DialogDescription className="row-span-1 overflow-y-auto">
 								<div>
-									{backtestResults && (
+									{backtestResults ? (
 										<Table className="overflow-clip">
-										{/* <TableHeader>
+											{/* <TableHeader>
 										  <TableRow>
 											<TableHead className="w-[100px]">Invoice</TableHead>
 											<TableHead>Status</TableHead>
@@ -90,15 +87,23 @@ const BacktestCard = ({
 											<TableHead className="text-right">Amount</TableHead>
 										  </TableRow>
 										</TableHeader> */}
-										<TableBody>
-										  {Object.entries(backtestResults).map(([k, v]) => (
-											<TableRow>
-											  <TableCell>{k}</TableCell>
-											  <TableCell>{v}</TableCell>
-											</TableRow>
-										  ))}
-										</TableBody>
-									  </Table>
+											<TableBody>
+												{Object.entries(backtestResults).map(([k, v]) => (
+													<TableRow>
+														<TableCell>{k}</TableCell>
+														<TableCell>{v}</TableCell>
+													</TableRow>
+												))}
+											</TableBody>
+										</Table>
+									) : (
+										<div className="flex flex-col space-y-3">
+											<Skeleton className="h-[125px] w-[250px] rounded-xl" />
+											<div className="space-y-2">
+												<Skeleton className="h-4 w-[250px]" />
+												<Skeleton className="h-4 w-[200px]" />
+											</div>
+										</div>
 									)}
 								</div>
 							</DialogDescription>

@@ -38,29 +38,31 @@ def pred_closing_price(df, scaler, model):
     return predicted_price
 
 def main():
-	model_filepath = "model/model.pkl"
-	scaler_filepath = "model/scaler.gz"
-	data_filepath = "data/stock_data.csv"
+    print('start')
+
+    model_filepath = "model/model.pkl"
+    scaler_filepath = "model/scaler.gz"
+    data_filepath = "data/stock_data.csv"
 
 	# load pkl model file
-	print('Loading model...')
-	with open(model_filepath, 'rb') as f:
-		model = pickle.load(f)
-	print(" ")
+    print('Loading model...')
+    with open(model_filepath, 'rb') as f:
+        model = pickle.load(f)
+    print(" ")
 
-	print('Loading data...')
-	df = load_process_data(data_filepath)
-	print(" ")
+    print('Loading data...')
+    df = load_process_data(data_filepath)
+    print(" ")
 
-	print('Loading scaler file...')
-	my_scaler = joblib.load(scaler_filepath)
-	print(" ")
+    print('Loading scaler file...')
+    my_scaler = joblib.load(scaler_filepath)
+    print(" ")
 
-	print('Predicting closing stock price...')
-	predicted_price = pred_closing_price(df, my_scaler, model)
-	print(" ")
+    print('Predicting closing stock price...')
+    predicted_price = pred_closing_price(df, my_scaler, model)
+    print(" ")
 
-	print('Predicted price: '+'$ '+str("{:.2f}".format(predicted_price)))
+    print('Predicted price: '+'$ '+str("{:.2f}".format(predicted_price)))
 
 if __name__ == '__main__':
     main()

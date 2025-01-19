@@ -144,7 +144,7 @@ function App() {
 	};
 
 	return (
-		<div className="grid grid-cols-4 grid-rows-12 gap-4 min-h-screen max-h-screen p-4 lg:overflow-hidden">
+		<div className="grid grid-cols-4 grid-rows-12 gap-4 min-h-screen max-h-screen p-4">
 			<FetchStockCard {...fetchStockCardProps} />
 			<BacktestCard {...backtestCardProps} />
 			<StockGraphCard stockData={stockData} />
