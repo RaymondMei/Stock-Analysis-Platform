@@ -1,8 +1,17 @@
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardTitle } from "@/components/ui/card";
 import { BacktestResult } from "@/App";
+import { Button } from "@/components/ui/button";
+
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
 
 export interface BacktestCardProps {
 	initialInvestment: number | undefined;
@@ -12,7 +21,7 @@ export interface BacktestCardProps {
 	longWindow: number | undefined;
 	setLongWindow: (longWindow: number) => void;
 	backtestResults: BacktestResult[] | undefined;
-	runBacktest: () => void;
+	runBacktest: (event: React.FormEvent) => void;
 }
 
 const BacktestCard = ({
@@ -26,8 +35,12 @@ const BacktestCard = ({
 	runBacktest,
 }: BacktestCardProps) => {
 	return (
-		<Card className="col-span-1 col-start-1 row-span-6 grid p-4 overflow-clip">
-			<CardTitle>Backtest</CardTitle>
+		<Card className="col-span-1 col-start-1 row-span-6 grid grid-rows-10 p-4 overflow-clip">
+			<CardTitle className="row-start-1 row-span-1">Backtest</CardTitle>
+			<form
+				className="row-start-2 row-span-9 col-span-full grid gap-2"
+				onSubmit={(event: React.FormEvent) => runBacktest(event)}
+			>
 				<Label htmlFor="initialInvestment">Initial Investment</Label>
 				<Input
 					id="initialInvestment"
@@ -52,33 +65,42 @@ const BacktestCard = ({
 					onChange={(e) => setLongWindow(Number(e.target.value))}
 					placeholder="20"
 				/>
-				<Button onClick={runBacktest}>
-					Run Backtest
-				</Button>
-				<div>
-					{backtestResults && (
-						<table>
-							<thead>
-								<tr>
-									<th>Date</th>
-									<th>Portfolio Value</th>
-									<th>Stock Value</th>
-									<th>Cash</th>
-								</tr>
-							</thead>
-							<tbody>
-								{backtestResults.map((day, index) => (
-									<tr key={index}>
-										<td>{day.date}</td>
-										<td>{day.portfolioValue}</td>
-										<td>{day.stockValue}</td>
-										<td>{day.cash}</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-					)}
-				</div>
+				<Dialog>
+					<DialogTrigger asChild>
+						<Button type="submit">Run Backtest</Button>
+					</DialogTrigger>
+					<DialogContent>
+						<DialogHeader>
+							<DialogTitle>Backtest Results</DialogTitle>
+							<DialogDescription>
+								<div>
+									{backtestResults && (
+										// <table>
+										// 	<thead>
+										// 		<tr>
+										// 			{
+										// 				Object.keys(backtestResults).map((key) => (
+										// 					<th>{key}</th>
+										// 				))
+										// 			}
+										// 		</tr>
+										// 	</thead>
+										// 	<tbody>
+										// 		{Object.entries(backtestResults).map((key, value) => (
+										// 			<tr>
+										// 				<td>{value}</td>
+										// 			</tr>
+										// 		))}
+										// 	</tbody>
+										// </table>
+										<p>{JSON.stringify(backtestResults)}</p>
+									)}
+								</div>
+							</DialogDescription>
+						</DialogHeader>
+					</DialogContent>
+				</Dialog>
+			</form>
 		</Card>
 	);
 };

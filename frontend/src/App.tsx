@@ -38,7 +38,8 @@ function App() {
 	const [longWindow, setLongWindow] = useState<number | undefined>();
 	const [backtestResults, setBacktestResults] = useState<BacktestResult[]>();
 
-	const fetchStockData = async () => {
+	const fetchStockData = async (event: React.FormEvent) => {
+		event.preventDefault();
 		try {
 			const response = await fetch(
 				`http://127.0.0.1:8000/stockhistory?ticker=${ticker}`
@@ -55,14 +56,28 @@ function App() {
 		}
 	};
 
-	const runBacktest = () => {
-		// Implement backtest logic here
-		setBacktestResults([]);
+	const runBacktest = async (event: React.FormEvent) => {
+		event.preventDefault();
 		console.log("Running backtest with:", {
 			initialInvestment,
 			shortWindow,
 			longWindow,
 		});
+		try {
+			const response = await fetch(
+				// `http://127.0.0.1:8000/simplemovingaverage?ticker=AAPL&shortWindow=10&longWindow=20`
+				`http://127.0.0.1:8000/simplemovingaverage?ticker=${ticker}&shortWindow=${shortWindow}&longWindow=${longWindow}`
+			);
+			const data = await response.json();
+			if ("error" in data) {
+				setBacktestResults(undefined);
+			} else {
+				setBacktestResults(data);
+			}
+		} catch (error) {
+			setBacktestResults(undefined);
+			console.error("Error running backtest:", error);
+		}
 	};
 
 	// const chartData = {

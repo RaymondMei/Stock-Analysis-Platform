@@ -49,7 +49,7 @@ const StockTableCard = ({ stockData }: StockTableCardProps) => {
 									colSpan={6}
 									className="h-24 text-center"
 								>
-									Error Fetching Data
+									No Data
 								</TableCell>
 							</TableRow>
 						)}

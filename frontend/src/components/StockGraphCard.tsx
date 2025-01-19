@@ -39,11 +39,11 @@ const StockGraphCard = ({ stockData }: StockGraphCardProps) => {
 		if (!stockData) return [];
 		return Object.entries(stockData).map(([date, data]) => ({
 			date: new Date(date),
-			open: +data.open,
-			high: +data.high,
-			low: +data.low,
-			close: +data.close,
-			volume: +data.volume,
+			open: data.open,
+			high: data.high,
+			low: data.low,
+			close: data.close,
+			volume: data.volume,
 		}));
 	}, [stockData]);
 
@@ -71,6 +71,7 @@ const StockGraphCard = ({ stockData }: StockGraphCardProps) => {
 		>
 			{stockData && (
 				<ChartCanvas
+
 					height={height - 35}
 					width={width - 35}
 					ratio={window.devicePixelRatio}
@@ -84,7 +85,7 @@ const StockGraphCard = ({ stockData }: StockGraphCardProps) => {
 				>
 					<Chart id={1} yExtents={(d) => [d.high, d.low]}>
 						<XAxis axisAt="bottom" orient="bottom" ticks={30} />
-						<YAxis axisAt="left" orient="left" ticks={10} showGridLines />
+						<YAxis axisAt="left" orient="left" ticks={10} />
 						<CandlestickSeries />
 					</Chart>
 				</ChartCanvas>
