@@ -8,12 +8,17 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { ThreeDots } from "react-loader-spinner";
 
 export interface StockTableCardProps {
+	loadingStockData: boolean;
 	stockData?: StockData;
 }
 
-const StockTableCard = ({ stockData }: StockTableCardProps) => {
+const StockTableCard = ({
+	loadingStockData,
+	stockData,
+}: StockTableCardProps) => {
 	return (
 		<Card className="col-span-4 row-span-4 overflow-y-auto">
 			<CardHeader>
@@ -32,7 +37,7 @@ const StockTableCard = ({ stockData }: StockTableCardProps) => {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{stockData ? (
+						{!loadingStockData && stockData ? (
 							Object.entries(stockData).map(([date, value]) => (
 								<TableRow key={date}>
 									<TableCell className="font-medium">{date}</TableCell>
@@ -45,11 +50,17 @@ const StockTableCard = ({ stockData }: StockTableCardProps) => {
 							))
 						) : (
 							<TableRow>
-								<TableCell
-									colSpan={6}
-									className="h-24 text-center"
-								>
-									No Data
+								<TableCell colSpan={6} className="justify-items-center">
+									<ThreeDots
+										visible={true}
+										height="50"
+										width="50"
+										color="black"
+										radius="9"
+										ariaLabel="three-dots-loading"
+										wrapperStyle={{}}
+										wrapperClass=""
+									/>
 								</TableCell>
 							</TableRow>
 						)}

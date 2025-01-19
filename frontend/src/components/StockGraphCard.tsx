@@ -11,11 +11,17 @@ import {
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { StockData } from "@/App";
 
+import { ThreeDots } from "react-loader-spinner";
+
 export interface StockGraphCardProps {
+	loadingStockData: boolean;
 	stockData?: StockData;
 }
 
-const StockGraphCard = ({ stockData }: StockGraphCardProps) => {
+const StockGraphCard = ({
+	loadingStockData,
+	stockData,
+}: StockGraphCardProps) => {
 	const componentRef = useRef<HTMLHeadingElement>(null);
 	const [width, setWidth] = useState(0);
 	const [height, setHeight] = useState(0);
@@ -66,12 +72,11 @@ const StockGraphCard = ({ stockData }: StockGraphCardProps) => {
 
 	return (
 		<Card
-			className="col-span-3 row-span-8 p-4 row-start-1 col-start-2"
+			className="col-span-3 row-span-8 p-4 row-start-1 col-start-2 grid justify-center items-center"
 			ref={componentRef}
 		>
-			{stockData && (
+			{(!loadingStockData && stockData) ? (
 				<ChartCanvas
-
 					height={height - 35}
 					width={width - 35}
 					ratio={window.devicePixelRatio}
@@ -89,6 +94,17 @@ const StockGraphCard = ({ stockData }: StockGraphCardProps) => {
 						<CandlestickSeries />
 					</Chart>
 				</ChartCanvas>
+			) : (
+				<ThreeDots
+					visible={true}
+					height="50"
+					width="50"
+					color="black"
+					radius="9"
+					ariaLabel="three-dots-loading"
+					wrapperStyle={{}}
+					wrapperClass=""
+				/>
 			)}
 		</Card>
 	);

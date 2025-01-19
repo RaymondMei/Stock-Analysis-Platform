@@ -8,7 +8,7 @@ import FetchStockCard, {
 import StockTableCard, {
 	StockTableCardProps,
 } from "./components/StockTableCard";
-import StockGraphCard from "./components/StockGraphCard";
+import StockGraphCard, { StockGraphCardProps } from "./components/StockGraphCard";
 import BacktestCard, { BacktestCardProps } from "./components/BacktestCard";
 
 interface StockPoint {
@@ -63,9 +63,11 @@ function App() {
 	const [shortWindow, setShortWindow] = useState<number | undefined>();
 	const [longWindow, setLongWindow] = useState<number | undefined>();
 	const [backtestResults, setBacktestResults] = useState<BacktestResult>();
+	const [loadingStockData, setLoadingStockData] = useState(false);
 
 	const fetchStockData = async (event: React.FormEvent) => {
 		event.preventDefault();
+		setLoadingStockData(true);
 		try {
 			const response = await fetch(
 				`http://127.0.0.1:8000/stockhistory?ticker=${ticker}`
@@ -75,12 +77,13 @@ function App() {
 				setStockData(undefined);
 				toast(`Error fetching stock data: ${data["error"]}`)
 			} else {
-				setStockData(data);
+				setStockData(data)
 			}
 		} catch (error) {
 			setStockData(undefined);
 			toast(`Error fetching stock data: ${error}`)
 		}
+		setLoadingStockData(false);
 	};
 
 	const runBacktest = async (event: React.FormEvent) => {
@@ -139,7 +142,13 @@ function App() {
 		runBacktest,
 	};
 
+	const stockGraphCardProps: StockGraphCardProps = {
+		loadingStockData,
+		stockData,
+	}
+
 	const stockTableCardProps: StockTableCardProps = {
+		loadingStockData,
 		stockData,
 	};
 
@@ -147,7 +156,7 @@ function App() {
 		<div className="grid grid-cols-4 grid-rows-12 gap-4 min-h-screen max-h-screen p-4">
 			<FetchStockCard {...fetchStockCardProps} />
 			<BacktestCard {...backtestCardProps} />
-			<StockGraphCard stockData={stockData} />
+			<StockGraphCard {...stockGraphCardProps} />
 			<StockTableCard {...stockTableCardProps} />
 			<Toaster />
 		</div>
