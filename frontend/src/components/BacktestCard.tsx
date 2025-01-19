@@ -3,6 +3,12 @@ import { Label } from "@/components/ui/label";
 import { Card, CardTitle } from "@/components/ui/card";
 import { BacktestResult } from "@/App";
 import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+} from "@/components/ui/table"
 
 import {
 	Dialog,
@@ -11,7 +17,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from "@/components/ui/dialog";
+  } from "@/components/ui/dialog"
 
 export interface BacktestCardProps {
 	initialInvestment: number | undefined;
@@ -20,7 +26,7 @@ export interface BacktestCardProps {
 	setShortWindow: (shortWindow: number) => void;
 	longWindow: number | undefined;
 	setLongWindow: (longWindow: number) => void;
-	backtestResults: BacktestResult[] | undefined;
+	backtestResults: BacktestResult | undefined;
 	runBacktest: (event: React.FormEvent) => void;
 }
 
@@ -69,31 +75,30 @@ const BacktestCard = ({
 					<DialogTrigger asChild>
 						<Button type="submit">Run Backtest</Button>
 					</DialogTrigger>
-					<DialogContent>
+					<DialogContent className="h-5/6 w-2/6 max-w-screen max-h-screen grid grid-cols-1 grid-rows-1">
 						<DialogHeader>
-							<DialogTitle>Backtest Results</DialogTitle>
-							<DialogDescription>
+							<DialogTitle className="pb-3">Backtest Results</DialogTitle>
+							<DialogDescription className="row-span-1 overflow-y-auto">
 								<div>
 									{backtestResults && (
-										// <table>
-										// 	<thead>
-										// 		<tr>
-										// 			{
-										// 				Object.keys(backtestResults).map((key) => (
-										// 					<th>{key}</th>
-										// 				))
-										// 			}
-										// 		</tr>
-										// 	</thead>
-										// 	<tbody>
-										// 		{Object.entries(backtestResults).map((key, value) => (
-										// 			<tr>
-										// 				<td>{value}</td>
-										// 			</tr>
-										// 		))}
-										// 	</tbody>
-										// </table>
-										<p>{JSON.stringify(backtestResults)}</p>
+										<Table className="overflow-clip">
+										{/* <TableHeader>
+										  <TableRow>
+											<TableHead className="w-[100px]">Invoice</TableHead>
+											<TableHead>Status</TableHead>
+											<TableHead>Method</TableHead>
+											<TableHead className="text-right">Amount</TableHead>
+										  </TableRow>
+										</TableHeader> */}
+										<TableBody>
+										  {Object.entries(backtestResults).map(([k, v]) => (
+											<TableRow>
+											  <TableCell>{k}</TableCell>
+											  <TableCell>{v}</TableCell>
+											</TableRow>
+										  ))}
+										</TableBody>
+									  </Table>
 									)}
 								</div>
 							</DialogDescription>

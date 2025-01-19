@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { toast } from "sonner"
+import { Toaster } from "@/components/ui/sonner"
 import "./App.css";
 import FetchStockCard, {
 	FetchStockCardProps,
@@ -22,10 +24,34 @@ export interface StockData {
 }
 
 export interface BacktestResult {
-	date: string;
-	portfolioValue: number;
-	stockValue: number;
-	cash: number;
+	Start: string;
+	End: string;
+	Duration: string;
+	'Exposure Time [%]': number;
+	'Equity Final [$]': number;
+	'Equity Peak [$]': number;
+	'Return [%]': number;
+	'Buy & Hold Return [%]': number;
+	'Return (Ann.) [%]': number;
+	'Volatility (Ann.) [%]': number;
+	'Sharpe Ratio': number;
+	'Sortino Ratio': number;
+	'Calmar Ratio': number;
+	'Max. Drawdown [%]': number;
+	'Avg. Drawdown [%]': number;
+	'Max. Drawdown Duration': string;
+	'Avg. Drawdown Duration': string;
+	'# Trades': number;
+	'Win Rate [%]': number;
+	'Best Trade [%]': number;
+	'Worst Trade [%]': number;
+	'Avg. Trade [%]': number;
+	'Max. Trade Duration': string;
+	'Avg. Trade Duration': string;
+	'Profit Factor': number | null;
+	'Expectancy [%]': number;
+	SQN: number;
+	_strategy: string;
 }
 
 function App() {
@@ -36,7 +62,7 @@ function App() {
 	>();
 	const [shortWindow, setShortWindow] = useState<number | undefined>();
 	const [longWindow, setLongWindow] = useState<number | undefined>();
-	const [backtestResults, setBacktestResults] = useState<BacktestResult[]>();
+	const [backtestResults, setBacktestResults] = useState<BacktestResult>();
 
 	const fetchStockData = async (event: React.FormEvent) => {
 		event.preventDefault();
@@ -47,12 +73,13 @@ function App() {
 			const data = await response.json();
 			if ("error" in data) {
 				setStockData(undefined);
+				toast(`Error fetching stock data: ${data["error"]}`)
 			} else {
 				setStockData(data);
 			}
 		} catch (error) {
 			setStockData(undefined);
-			console.error("Error fetching stock data:", error);
+			toast(`Error fetching stock data: ${error}`)
 		}
 	};
 
@@ -66,17 +93,20 @@ function App() {
 		try {
 			const response = await fetch(
 				// `http://127.0.0.1:8000/simplemovingaverage?ticker=AAPL&shortWindow=10&longWindow=20`
-				`http://127.0.0.1:8000/simplemovingaverage?ticker=${ticker}&shortWindow=${shortWindow}&longWindow=${longWindow}`
+				`http://127.0.0.1:8000/simplemovingaverage?ticker=${ticker}&initialInvestment=${
+					initialInvestment ?? 1000
+				}&shortWindow=${shortWindow ?? 10}&longWindow=${longWindow ?? 20}`
 			);
 			const data = await response.json();
 			if ("error" in data) {
 				setBacktestResults(undefined);
+				toast(`Error running backtest: ${data["error"]}`)
 			} else {
-				setBacktestResults(data);
+				setBacktestResults(data as BacktestResult);
 			}
 		} catch (error) {
 			setBacktestResults(undefined);
-			console.error("Error running backtest:", error);
+			toast(`Error running backtest: ${error}`)
 		}
 	};
 
@@ -114,11 +144,12 @@ function App() {
 	};
 
 	return (
-		<div className="grid grid-cols-4 grid-rows-12 gap-4 min-h-screen max-h-screen p-4">
+		<div className="grid grid-cols-4 grid-rows-12 gap-4 min-h-screen max-h-screen p-4 lg:overflow-hidden">
 			<FetchStockCard {...fetchStockCardProps} />
 			<BacktestCard {...backtestCardProps} />
 			<StockGraphCard stockData={stockData} />
 			<StockTableCard {...stockTableCardProps} />
+			<Toaster />
 		</div>
 	);
 }

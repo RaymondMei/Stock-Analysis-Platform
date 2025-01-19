@@ -39,11 +39,11 @@ const StockGraphCard = ({ stockData }: StockGraphCardProps) => {
 		if (!stockData) return [];
 		return Object.entries(stockData).map(([date, data]) => ({
 			date: new Date(date),
-			open: data.open,
-			high: data.high,
-			low: data.low,
-			close: data.close,
-			volume: data.volume,
+			open: +data.open,
+			high: +data.high,
+			low: +data.low,
+			close: +data.close,
+			volume: +data.volume,
 		}));
 	}, [stockData]);
 

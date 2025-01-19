@@ -23,7 +23,7 @@ const FetchStockCard = ({
 					value={ticker}
 					onChange={(e) => setTicker(e.target.value)}
 					placeholder="Ticker Symbol"
-					className="col-start-1 sm:col-span-5 col-span-3"
+					className="col-start-1 md:col-span-5 col-span-3"
 				/>
 				<Button type="submit" className="sm:col-span-1 col-span-3 min-w-16">Search</Button>
 			</form>

@@ -18,13 +18,12 @@ import datetime as dt
 
 
 class SMAStrategy(Strategy):
-	sw = 10
-	lw = 20
+	shortWindow = 5
+	longWindow = 20
 	def init(self):
 		price = self.data.Close
-		print('win', self.sw, self.lw)
-		self.ma1 = self.I(SMA, price, 10)#self.shortWindow)
-		self.ma2 = self.I(SMA, price, 20)#self.longWindow)
+		self.ma1 = self.I(SMA, price, self.shortWindow)
+		self.ma2 = self.I(SMA, price, self.longWindow)
 	def next(self):
 		if crossover(self.ma1, self.ma2):
 			self.buy()
@@ -38,8 +37,9 @@ def simpleMovingAverage(request):
 		startDate = "2024-1-1" # request.GET.get('start-date')
 		endDate = "2024-12-31" # request.GET.get('end-date')
 		ticker = request.GET.get('ticker')
-		shortWindow = request.GET.get('shortWindow')
-		longWindow = request.GET.get('longWindow')
+		initialInvestment = int(request.GET.get('initialInvestment'))
+		shortWindow = int(request.GET.get('shortWindow'))
+		longWindow = int(request.GET.get('longWindow'))
 
 		try:
             # Fetch data
@@ -50,34 +50,29 @@ def simpleMovingAverage(request):
 			data.index = pd.DatetimeIndex(data['Date'], tz='UTC')
 
 			# Run backtest
-			backtest = Backtest(data, SMAStrategy, commission=.002, exclusive_orders=True)
-			stats = backtest.run(sw=shortWindow, lw=longWindow).to_dict()
+			backtest = Backtest(data, SMAStrategy, cash=initialInvestment, commission=.002, exclusive_orders=True)
+			stats = backtest.run(shortWindow=shortWindow, longWindow=longWindow).to_dict()
 			del stats['_equity_curve']
 			del stats['_trades']
 
 			stats_dict = {}
 			for key, value in stats.items():
-				if isinstance(value, pd.Timestamp):
-					stats_dict[key] = value.to_pydatetime()
+				if pd.isna(value):
+					stats_dict[key] = None
+				elif isinstance(value, pd.Timestamp):
+					stats_dict[key] = value.to_pydatetime().isoformat()
 				elif isinstance(value, pd.Timedelta):
-					stats_dict[key] = value.to_pytimedelta()
+					stats_dict[key] = str(value)
 				elif isinstance(value, (int, float, str, bool, list, dict)):
 					stats_dict[key] = value  # No conversion needed
+				elif isinstance(value, dt.datetime):
+					stats_dict[key] = value.isoformat()
+				elif isinstance(value, np.float64):
+					stats_dict[key] = float(value)
+				elif isinstance(value, np.int64):
+					stats_dict[key] = int(value)
 				else:
 					stats_dict[key] = str(value)  # Fallback for unknown types
-
-			print(stats)
-			# Prepare response data
-			response_data = {
-				"ticker": ticker,
-				"start_date": startDate,
-				"end_date": endDate,
-				"performance_metrics": stats # Convert stats to a serializable format
-			}
-			print("------------------")
-			for k, v in stats_dict.items():
-				print(k, type(v))
-			# print(response_data.items())
 
 			# Optional: Save or process plot
 			# backtest.plot()  # Comment/remove this line for API-only behavior
