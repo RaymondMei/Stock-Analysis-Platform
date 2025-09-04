@@ -77,3 +77,6 @@ button:focus-visible {
     --radius: 0.5rem
   }
 }
+
+.grid-stack { background: #FAFAD2; }
+.grid-stack-item-content { background-color: #18BC9C; }

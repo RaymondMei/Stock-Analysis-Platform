@@ -15,27 +15,38 @@ from datetime import datetime as dt
 def getStockHistory(request):
 	if request.method == 'GET':
 		ticker = request.GET['ticker']
-
-		# Fetch data from Yahoo Finance
-		# data = yfin.Ticker(ticker).history(start="2024-1-1", end="2024-12-31")
-		# data.to_csv(f'fetchfinancialdata/YahooFinanceData/{ticker}-2024.csv')
 		
-		# Read data from cached CSV Yahoo Finance response file
 		try:
-			data = pd.read_csv(f'fetchfinancialdata/YahooFinanceData/{ticker}-2024.csv')
+			# Fetch data from Yahoo Finance
+			data = []
+			cached = True
+			try:
+				data = pd.read_csv(f'fetchfinancialdata/YahooFinanceData/{ticker}-2024.csv')
+				cached = True
+			except FileNotFoundError: 
+				data = yfin.Ticker(ticker).history(start="2024-1-1", end="2024-12-31")
+				cached = False
+
+			if len(data) <= 0:
+				raise FileNotFoundError
+			
+			data.to_csv(f'fetchfinancialdata/YahooFinanceData/{ticker}-2024.csv')
 
 			data = data.to_json(orient='index')
 			data = json.loads(data)
 
 			dateFormattedData = {}
 			for k, v in data.items():
-				# if reading from yfinance:
-				# dateFormattedData[dt.fromtimestamp(int(k) / 1000).date().isoformat()] = {'open': v['Open'], 'high': v['High'], 'low': v['Low'], 'close': v['Close'], 'volume': v['Volume']}
-				# if reading from csv:
-				dateFormattedData[dt.strptime(v['Date'], "%Y-%m-%d %H:%M:%S%z").date().isoformat()] = {'open': v['Open'], 'high': v['High'], 'low': v['Low'], 'close': v['Close'], 'volume': v['Volume']}
+				if cached:
+					# if reading from csv:
+					dateFormattedData[dt.strptime(v['Date'], "%Y-%m-%d %H:%M:%S%z").date().isoformat()] = {'open': v['Open'], 'high': v['High'], 'low': v['Low'], 'close': v['Close'], 'volume': v['Volume']}
+				else:
+					# if reading from yfinance:
+					dateFormattedData[dt.fromtimestamp(int(k) / 1000).date().isoformat()] = {'open': v['Open'], 'high': v['High'], 'low': v['Low'], 'close': v['Close'], 'volume': v['Volume']}
 
-			with open(f'fetchfinancialdata/YahooFinanceData/{ticker}-2024.json', 'w') as file:
-				json.dump(dateFormattedData, file, indent=4)
+			if not cached:
+				with open(f'fetchfinancialdata/YahooFinanceData/{ticker}-2024.json', 'w') as file:
+					json.dump(dateFormattedData, file, indent=4)
 
 			return Response(dateFormattedData, status=status.HTTP_200_OK)
 		except FileNotFoundError:

@@ -11,6 +11,13 @@ import StockTableCard, {
 import StockGraphCard, { StockGraphCardProps } from "./components/StockGraphCard";
 import BacktestCard, { BacktestCardProps } from "./components/BacktestCard";
 
+import {DndContext} from '@dnd-kit/core';
+import {Draggable} from './components/Draggable';
+import {Droppable} from './components/Droppable';
+
+// const apiUrl = import.meta.env.VITE_REACT_APP_API_URL ?? "http://localhost:8000";
+const apiUrl = ((window.location.href).substring(0, (window.location.href).lastIndexOf(":")) + ":8000");
+
 interface StockPoint {
 	open: string;
 	high: string;
@@ -70,7 +77,8 @@ function App() {
 		setLoadingStockData(true);
 		try {
 			const response = await fetch(
-				`http://127.0.0.1:8000/stockhistory?ticker=${ticker}`
+				`${apiUrl}/stockhistory?ticker=${ticker}`
+				// `http://3.84.181.13:8000/stockhistory?ticker=${ticker}`
 			);
 			const data = await response.json();
 			if ("error" in data) {
@@ -88,17 +96,14 @@ function App() {
 
 	const runBacktest = async (event: React.FormEvent) => {
 		event.preventDefault();
-		console.log("Running backtest with:", {
-			initialInvestment,
-			shortWindow,
-			longWindow,
-		});
 		try {
 			const response = await fetch(
-				// `http://127.0.0.1:8000/simplemovingaverage?ticker=AAPL&shortWindow=10&longWindow=20`
-				`http://127.0.0.1:8000/simplemovingaverage?ticker=${ticker}&initialInvestment=${
+				`${apiUrl}/simplemovingaverage?ticker=${ticker}&initialInvestment=${
 					initialInvestment ?? 1000
 				}&shortWindow=${shortWindow ?? 10}&longWindow=${longWindow ?? 20}`
+				// `http://3.84.181.13:8000/simplemovingaverage?ticker=${ticker}&initialInvestment=${
+				// 	initialInvestment ?? 1000
+				// }&shortWindow=${shortWindow ?? 10}&longWindow=${longWindow ?? 20}`
 			);
 			const data = await response.json();
 			if ("error" in data) {
@@ -153,13 +158,18 @@ function App() {
 	};
 
 	return (
-		<div className="grid grid-cols-4 grid-rows-12 gap-4 min-h-screen max-h-screen p-4">
-			<FetchStockCard {...fetchStockCardProps} />
-			<BacktestCard {...backtestCardProps} />
-			<StockGraphCard {...stockGraphCardProps} />
-			<StockTableCard {...stockTableCardProps} />
-			<Toaster />
-		</div>
+		https://docs.dndkit.com/introduction/getting-started
+		<DndContext>
+		<Draggable />
+		<Droppable />
+		</DndContext>
+		// <div className="grid grid-cols-4 grid-rows-12 gap-4 min-h-screen max-h-screen p-4">
+		// 	<FetchStockCard {...fetchStockCardProps} />
+		// 	<BacktestCard {...backtestCardProps} />
+		// 	<StockGraphCard {...stockGraphCardProps} />
+		// 	<StockTableCard {...stockTableCardProps} />
+		// 	<Toaster />
+		// </div>
 	);
 }
 

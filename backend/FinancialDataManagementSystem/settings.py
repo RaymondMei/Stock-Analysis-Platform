@@ -29,7 +29,9 @@ SECRET_KEY = config("DJANGO_SECRET_KEY")
  
 DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
  
-ALLOWED_HOSTS = config("DJANGO_ALLOWED_HOSTs","127.0.0.1").split(",")
+# ALLOWED_HOSTS = config("DJANGO_ALLOWED_HOSTS","127.0.0.1").split(",")
+
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -145,4 +147,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://localhost:5173", "http://localhost:8000"]
+# CORS_ALLOWED_ORIGINS = ["http://3.95.250.136"]
+
+CORS_ALLOW_ALL_ORIGINS = True

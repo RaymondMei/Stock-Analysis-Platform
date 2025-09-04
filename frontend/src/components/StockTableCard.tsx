@@ -37,7 +37,7 @@ const StockTableCard = ({
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{!loadingStockData && stockData ? (
+						{stockData ? (
 							Object.entries(stockData).map(([date, value]) => (
 								<TableRow key={date}>
 									<TableCell className="font-medium">{date}</TableCell>
@@ -49,20 +49,30 @@ const StockTableCard = ({
 								</TableRow>
 							))
 						) : (
-							<TableRow>
-								<TableCell colSpan={6} className="justify-items-center">
-									<ThreeDots
-										visible={true}
-										height="50"
-										width="50"
-										color="black"
-										radius="9"
-										ariaLabel="three-dots-loading"
-										wrapperStyle={{}}
-										wrapperClass=""
-									/>
-								</TableCell>
-							</TableRow>
+							<>
+								{!loadingStockData ? (
+									<TableRow>
+										<TableCell colSpan={6} className="justify-items-center">
+											<ThreeDots
+												visible={true}
+												height="50"
+												width="50"
+												color="black"
+												radius="9"
+												ariaLabel="three-dots-loading"
+												wrapperStyle={{}}
+												wrapperClass=""
+											/>
+										</TableCell>
+									</TableRow>
+								) : (
+									<TableRow>
+										<TableCell colSpan={6} className="justify-items-center">
+											No data available
+										</TableCell>
+									</TableRow>
+								)}
+							</>
 						)}
 					</TableBody>
 				</Table>

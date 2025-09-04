@@ -12,6 +12,7 @@ import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { StockData } from "@/App";
 
 import { ThreeDots } from "react-loader-spinner";
+import TradingViewWidget from "./TradingViewWidget";
 
 export interface StockGraphCardProps {
 	loadingStockData: boolean;
@@ -32,7 +33,10 @@ const StockGraphCard = ({
 		const handleResize = () => {
 			setWidth(componentRef.current?.offsetWidth ?? 0);
 			setHeight(componentRef.current?.offsetHeight ?? 0);
+			console.log("Resizing StockGraphCard", width, height);
 		};
+
+		handleResize(); // Set initial size
 
 		window.addEventListener("resize", handleResize);
 
@@ -41,41 +45,44 @@ const StockGraphCard = ({
 		};
 	}, []);
 
-	const parsedData = useMemo(() => {
-		if (!stockData) return [];
-		return Object.entries(stockData).map(([date, data]) => ({
-			date: new Date(date),
-			open: +data.open,
-			high: +data.high,
-			low: +data.low,
-			close: +data.close,
-			volume: +data.volume,
-		}));
-	}, [stockData]);
+	// const parsedData = useMemo(() => {
+	// 	if (!stockData) return [];
+	// 	return Object.entries(stockData).map(([date, data]) => ({
+	// 		date: new Date(date),
+	// 		open: +data.open,
+	// 		high: +data.high,
+	// 		low: +data.low,
+	// 		close: +data.close,
+	// 		volume: +data.volume,
+	// 	}));
+	// }, [stockData]);
 
-	// Use discontinuous time scale for x-axis
-	const xScaleProvider = discontinuousTimeScaleProvider.inputDateAccessor(
-		(d) => d.date
-	);
-	const {
-		data: chartData,
-		xScale,
-		xAccessor,
-		displayXAccessor,
-	} = xScaleProvider(parsedData);
+	// // Use discontinuous time scale for x-axis
+	// const xScaleProvider = discontinuousTimeScaleProvider.inputDateAccessor(
+	// 	(d) => d.date
+	// );
+	// const {
+	// 	data: chartData,
+	// 	xScale,
+	// 	xAccessor,
+	// 	displayXAccessor,
+	// } = xScaleProvider(parsedData);
 
-	const margin = { left: 50, right: 50, top: 50, bottom: 50 };
-	const xExtents = [
-		xAccessor(chartData[0]),
-		xAccessor(chartData[chartData.length - 1]),
-	];
+	// const margin = { left: 50, right: 50, top: 50, bottom: 50 };
+	// const xExtents = [
+	// 	xAccessor(chartData[0]),
+	// 	xAccessor(chartData[chartData.length - 1]),
+	// ];
 
 	return (
 		<Card
-			className="col-span-3 row-span-8 p-4 row-start-1 col-start-2 grid justify-center items-center"
+			className="bg-red-50 col-span-3 row-span-8 p-4 row-start-1 col-start-2 grid justify-center items-center"
 			ref={componentRef}
 		>
-			{(!loadingStockData && stockData) ? (
+			<div className="bg-blue-50" style={{ width: width - 35, height: height - 35 }}>
+				<TradingViewWidget />
+			</div>
+			{/* {stockData ? (
 				<ChartCanvas
 					height={height - 35}
 					width={width - 35}
@@ -95,17 +102,23 @@ const StockGraphCard = ({
 					</Chart>
 				</ChartCanvas>
 			) : (
-				<ThreeDots
-					visible={true}
-					height="50"
-					width="50"
-					color="black"
-					radius="9"
-					ariaLabel="three-dots-loading"
-					wrapperStyle={{}}
-					wrapperClass=""
-				/>
-			)}
+				<>
+					{loadingStockData ? (
+						<ThreeDots
+							visible={true}
+							height="50"
+							width="50"
+							color="black"
+							radius="9"
+							ariaLabel="three-dots-loading"
+							wrapperStyle={{}}
+							wrapperClass=""
+						/>
+					) : (
+						<div>No data available</div>
+					)}
+				</>
+			)} */}
 		</Card>
 	);
 };

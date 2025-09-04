@@ -75,7 +75,7 @@ def simpleMovingAverage(request):
 					stats_dict[key] = str(value)  # Fallback for unknown types
 
 			# Optional: Save or process plot
-			# backtest.plot()  # Comment/remove this line for API-only behavior
+			backtest.plot(filename=f"backtest/BacktestResults/SMAStrategy")  # Comment/remove this line for API-only behavior
 
 			return Response(stats_dict, status=status.HTTP_200_OK)
 		except Exception as e:
