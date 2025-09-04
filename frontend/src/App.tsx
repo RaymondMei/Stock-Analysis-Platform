@@ -2,6 +2,8 @@ import { useState } from "react";
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
 import "./App.css";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
 import FetchStockCard, {
 	FetchStockCardProps,
 } from "./components/FetchStockCard";
@@ -10,10 +12,11 @@ import StockTableCard, {
 } from "./components/StockTableCard";
 import StockGraphCard, { StockGraphCardProps } from "./components/StockGraphCard";
 import BacktestCard, { BacktestCardProps } from "./components/BacktestCard";
+import Navbar, { NavbarProps } from "./components/Navbar";
 
-import {DndContext} from '@dnd-kit/core';
-import {Draggable} from './components/Draggable';
-import {Droppable} from './components/Droppable';
+import { Responsive, WidthProvider } from "react-grid-layout";
+
+const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 // const apiUrl = import.meta.env.VITE_REACT_APP_API_URL ?? "http://localhost:8000";
 const apiUrl = ((window.location.href).substring(0, (window.location.href).lastIndexOf(":")) + ":8000");
@@ -61,6 +64,43 @@ export interface BacktestResult {
 	_strategy: string;
 }
 
+export type WidgetType =
+  | "watchlist"
+  | "backtest"
+  | "graph"
+  | "table"
+  | "market-overview"
+  | "quick-actions"
+  | "portfolio-summary"
+  | "top-movers"
+  | "market-news"
+  | "economic-calendar"
+  | "alerts"
+
+export interface Widget {
+  id: string
+  type: WidgetType
+  title: string
+  visible: boolean
+  position: number
+}
+
+const defaultWidgets: Widget[] = [
+//   { id: "watchlist", type: "watchlist", title: "My Watchlist", visible: true, position: 0 },
+//   { id: "market-overview", type: "market-overview", title: "Market Overview", visible: true, position: 1 },
+//   { id: "quick-actions", type: "quick-actions", title: "Quick Actions", visible: true, position: 2 },
+//   { id: "portfolio-summary", type: "portfolio-summary", title: "Portfolio Summary", visible: true, position: 3 },
+//   { id: "top-movers", type: "top-movers", title: "Top Movers", visible: false, position: 4 },
+//   { id: "market-news", type: "market-news", title: "Market News", visible: false, position: 5 },
+//   { id: "economic-calendar", type: "economic-calendar", title: "Economic Calendar", visible: false, position: 6 },
+//   { id: "alerts", type: "alerts", title: "Price Alerts", visible: false, position: 7 },
+	{id: "watchlist", type: "watchlist", title: "Fetch Stock Data", visible: true, position: 0},
+	{id: "backtest", type: "backtest", title: "Backtest", visible: true, position: 1},
+	{id: "graph", type: "graph", title: "Stock Graph", visible: true, position: 2},
+	{id: "table", type: "table", title: "Stock Table", visible: true, position: 3},
+]
+
+
 function App() {
 	const [ticker, setTicker] = useState("");
 	const [stockData, setStockData] = useState<StockData | undefined>();
@@ -71,6 +111,8 @@ function App() {
 	const [longWindow, setLongWindow] = useState<number | undefined>();
 	const [backtestResults, setBacktestResults] = useState<BacktestResult>();
 	const [loadingStockData, setLoadingStockData] = useState(false);
+	const [watchlist, setWatchlist] = useState<string[]>([]);
+  	const [widgets, setWidgets] = useState<Widget[]>(defaultWidgets);
 
 	const fetchStockData = async (event: React.FormEvent) => {
 		event.preventDefault();
@@ -157,19 +199,91 @@ function App() {
 		stockData,
 	};
 
+	const layouts = {
+		lg: [
+			{ i: "watchlist", x: 0, y: 0, w: 1, h: 4 },
+			{ i: "backtest", x: 1, y: 0, w: 1, h: 4 },
+			{ i: "graph", x: 2, y: 0, w: 2, h: 8 },
+			{ i: "table", x: 0, y: 4, w: 2, h: 8 },
+		],
+		md: [
+			{ i: "watchlist", x: 0, y: 0, w: 1, h: 4 },
+			{ i: "backtest", x: 1, y: 0, w: 1, h: 4 },
+			{ i: "graph", x: 0, y: 4, w: 2, h: 8 },
+			{ i: "table", x: 0, y: 12, w: 2, h: 8 },
+		],
+		sm: [
+			{ i: "watchlist", x: 0, y: 0, w: 2, h: 4 },
+			{ i: "backtest", x: 0, y: 4, w: 2, h: 4 },
+			{ i: "graph", x: 0, y: 8, w: 2, h: 8 },
+			{ i: "table", x: 0, y: 16, w: 2, h: 8 },
+		],
+		xs: [
+			{ i: "watchlist", x: 0, y: 0, w: 1, h: 4 },
+			{ i: "backtest", x: 0, y: 4, w: 1, h: 4 },
+			{ i: "graph", x: 0, y: 8, w: 1, h: 8 },
+			{ i: "table", x: 0, y: 16, w: 1, h: 8 },
+		],
+	};
+
+	const toggleWidget = (widgetId: string) => {
+		setWidgets((prev) =>
+			prev.map((widget) =>
+				widget.id === widgetId
+					? { ...widget, visible: !widget.visible }
+					: widget
+			)
+		);
+	};
+
+	const navbarProps: NavbarProps = {
+		widgets,
+		toggleWidget,
+	};
+
+	const visibleWidgets = widgets.filter((w) => w.visible).sort((a, b) => a.position - b.position);
+
+	const renderWidget = (widget: Widget) => {
+		switch (widget.type) {
+			case "watchlist":
+				return <FetchStockCard {...fetchStockCardProps} />
+			case "backtest":
+				return <BacktestCard {...backtestCardProps} />;
+			case "graph":
+				return <StockGraphCard {...stockGraphCardProps} />;
+			case "table":
+				return <StockTableCard {...stockTableCardProps} />;
+		}
+	}
+
 	return (
-		https://docs.dndkit.com/introduction/getting-started
-		<DndContext>
-		<Draggable />
-		<Droppable />
-		</DndContext>
-		// <div className="grid grid-cols-4 grid-rows-12 gap-4 min-h-screen max-h-screen p-4">
-		// 	<FetchStockCard {...fetchStockCardProps} />
-		// 	<BacktestCard {...backtestCardProps} />
-		// 	<StockGraphCard {...stockGraphCardProps} />
-		// 	<StockTableCard {...stockTableCardProps} />
-		// 	<Toaster />
-		// </div>
+		<div className="min-h-screen">
+			<Navbar {...navbarProps} />
+			<div className="p-4">
+				<ResponsiveReactGridLayout
+					className="layout"
+					layouts={layouts}
+					breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+					cols={{ lg: 4, md: 2, sm: 2, xs: 1, xxs: 1 }}
+					rowHeight={30}
+					isDraggable={true}
+					isResizable={true}
+					margin={[16, 16]}
+					compactType={null}
+					preventCollision={true}
+				>
+					{visibleWidgets.map((widget) => (
+						<div
+							key={widget.id}
+							className={"grid-card bg-white rounded-lg shadow-md"}
+						>
+							{renderWidget(widget)}
+						</div>
+					))}
+				</ResponsiveReactGridLayout>
+			</div>
+			<Toaster />
+		</div>
 	);
 }
 

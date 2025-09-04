@@ -1,17 +1,6 @@
 import { Card } from "@/components/ui/card";
-import {
-	ChartCanvas,
-	Chart,
-	CandlestickSeries,
-	XAxis,
-	YAxis,
-	discontinuousTimeScaleProvider,
-} from "react-financial-charts";
-
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { StockData } from "@/App";
-
-import { ThreeDots } from "react-loader-spinner";
 import TradingViewWidget from "./TradingViewWidget";
 
 export interface StockGraphCardProps {
@@ -76,10 +65,10 @@ const StockGraphCard = ({
 
 	return (
 		<Card
-			className="bg-red-50 col-span-3 row-span-8 p-4 row-start-1 col-start-2 grid justify-center items-center"
+			className="h-full p-4 flex justify-center items-center"
 			ref={componentRef}
 		>
-			<div className="bg-blue-50" style={{ width: width - 35, height: height - 35 }}>
+			<div className="w-full h-full">
 				<TradingViewWidget />
 			</div>
 			{/* {stockData ? (

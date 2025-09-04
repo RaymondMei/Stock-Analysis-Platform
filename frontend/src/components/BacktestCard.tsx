@@ -38,39 +38,45 @@ const BacktestCard = ({
 	runBacktest,
 }: BacktestCardProps) => {
 	return (
-		<Card className="col-span-1 col-start-1 row-span-6 grid grid-rows-10 p-4 overflow-clip">
-			<CardTitle className="row-start-1 row-span-1">Backtest</CardTitle>
+		<Card className="h-full p-4 flex flex-col">
+			<CardTitle className="mb-4">Backtest</CardTitle>
 			<form
-				className="row-start-2 row-span-9 col-span-full grid gap-2"
+				className="flex flex-col gap-2 flex-1"
 				onSubmit={(event: React.FormEvent) => runBacktest(event)}
 			>
-				<Label htmlFor="initialInvestment">Initial Investment</Label>
-				<Input
-					id="initialInvestment"
-					type="number"
-					value={initialInvestment}
-					onChange={(e) => setInitialInvestment(Number(e.target.value))}
-					placeholder="1000"
-				/>
-				<Label htmlFor="shortWindow">Short Window</Label>
-				<Input
-					id="shortWindow"
-					type="number"
-					value={shortWindow}
-					onChange={(e) => setShortWindow(Number(e.target.value))}
-					placeholder="5"
-				/>
-				<Label htmlFor="longWindow">Long Window</Label>
-				<Input
-					id="longWindow"
-					type="number"
-					value={longWindow}
-					onChange={(e) => setLongWindow(Number(e.target.value))}
-					placeholder="20"
-				/>
+				<div className="space-y-2">
+					<Label htmlFor="initialInvestment">Initial Investment</Label>
+					<Input
+						id="initialInvestment"
+						type="number"
+						value={initialInvestment}
+						onChange={(e) => setInitialInvestment(Number(e.target.value))}
+						placeholder="1000"
+					/>
+				</div>
+				<div className="space-y-2">
+					<Label htmlFor="shortWindow">Short Window</Label>
+					<Input
+						id="shortWindow"
+						type="number"
+						value={shortWindow}
+						onChange={(e) => setShortWindow(Number(e.target.value))}
+						placeholder="5"
+					/>
+				</div>
+				<div className="space-y-2">
+					<Label htmlFor="longWindow">Long Window</Label>
+					<Input
+						id="longWindow"
+						type="number"
+						value={longWindow}
+						onChange={(e) => setLongWindow(Number(e.target.value))}
+						placeholder="20"
+					/>
+				</div>
 				<Dialog>
 					<DialogTrigger asChild>
-						<Button type="submit">Run Backtest</Button>
+						<Button type="submit" className="mt-auto">Run Backtest</Button>
 					</DialogTrigger>
 					<DialogContent className="h-5/6 w-2/6 max-w-screen max-h-screen grid grid-cols-1 grid-rows-1">
 						<DialogHeader>

@@ -20,11 +20,11 @@ const StockTableCard = ({
 	stockData,
 }: StockTableCardProps) => {
 	return (
-		<Card className="col-span-4 row-span-4 overflow-y-auto">
+		<Card className="h-full flex flex-col">
 			<CardHeader>
 				<CardTitle>Stock Data</CardTitle>
 			</CardHeader>
-			<CardContent>
+			<CardContent className="flex-1 overflow-y-auto">
 				<Table>
 					<TableHeader>
 						<TableRow>

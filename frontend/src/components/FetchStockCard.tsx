@@ -14,18 +14,18 @@ const FetchStockCard = ({
 	fetchStockData,
 }: FetchStockCardProps) => {
 	return (
-		<Card className="col-span-1 col-start-1 row-span-2 p-4 grid overflow-clip">
-			<CardTitle className="col-span-full">Fetch Stock Data</CardTitle>
-			<form className="col-span-full grid grid-cols-6 gap-2" onSubmit={(event: React.FormEvent) => fetchStockData(event)}>
+		<Card className="h-full p-4 flex flex-col">
+			<CardTitle className="mb-4">Fetch Stock Data</CardTitle>
+			<form className="flex flex-col gap-2 flex-1" onSubmit={(event: React.FormEvent) => fetchStockData(event)}>
 				<Input
 					id="ticker"
 					type="text"
 					value={ticker}
 					onChange={(e) => setTicker(e.target.value)}
 					placeholder="Ticker Symbol"
-					className="col-start-1 md:col-span-5 col-span-3"
+					className="flex-1"
 				/>
-				<Button type="submit" className="sm:col-span-1 col-span-3 min-w-16">Search</Button>
+				<Button type="submit" className="w-full">Search</Button>
 			</form>
 		</Card>
 	);
