@@ -148,6 +148,7 @@ function App() {
 	const [watchlist, setWatchlist] = useState<string[]>([]);
   	const [widgets, setWidgets] = useState<Widget[]>(defaultWidgets);
 	const [layouts, setLayouts] = useState<{ [key: string]: Layout[] }>(defaultLayouts);
+	const [isManualLayoutChange, setIsManualLayoutChange] = useState(false);
 
 	const fetchStockData = async (event: React.FormEvent) => {
 		event.preventDefault();
@@ -239,7 +240,12 @@ function App() {
 	};
 
 	const onLayoutChange = (currentLayout: Layout[], allLayouts: { [key: string]: Layout[] }) => {
-        setLayouts(layouts);
+		if (isManualLayoutChange) {
+			setLayouts(layouts);
+			setIsManualLayoutChange(false); // for race condition with the compacting behavior
+		} else {
+			setLayouts(allLayouts);
+		}
     };
 
 	
@@ -248,7 +254,7 @@ function App() {
     // Handle layout updates when widget visibility changes
     useEffect(() => {
         const visibleWidgetIds = visibleWidgets.map(w => w.id);
-        
+        setIsManualLayoutChange(true);
         setLayouts(prevLayouts => {
             const newLayouts = { ...prevLayouts };
             
@@ -266,7 +272,6 @@ function App() {
 						const maxY = filteredLayout.reduce((max, item) => 
 							(item.y + item.h > max ? item.y + item.h : max), 0
 						);
-						const widget = widgets.find(w => w.id === widgetId);
 						const defaultSize = getDefaultSize();
 						filteredLayout.push({
 							i: widgetId,
@@ -311,6 +316,10 @@ function App() {
 	const navbarProps: NavbarProps = {
 		widgets,
 		toggleWidget,
+		resetLayout: () => {
+			console.log("Resetting layout to default");
+			setLayouts(defaultLayouts);
+		}
 	};
 
 	return (
