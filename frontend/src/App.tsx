@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
 import "./App.css";
@@ -78,11 +78,19 @@ export type WidgetType =
   | "alerts"
 
 export interface Widget {
-  id: string
-  type: WidgetType
-  title: string
-  visible: boolean
-  position: number
+  id: string;
+  type: WidgetType;
+  title: string;
+  visible: boolean;
+  position: number;
+}
+
+export interface Layout {
+	i: string;
+	x: number;
+	y: number;
+	w: number;
+	h: number;
 }
 
 const defaultWidgets: Widget[] = [
@@ -100,6 +108,32 @@ const defaultWidgets: Widget[] = [
 	{id: "table", type: "table", title: "Stock Table", visible: true, position: 3},
 ]
 
+const defaultLayouts: { [key: string]: Layout[] } = {
+	lg: [
+		{ i: "watchlist", x: 0, y: 0, w: 6, h: 12 },
+		{ i: "graph", x: 6, y: 0, w: 6, h: 12 },
+		{ i: "backtest", x: 0, y: 12, w: 8, h: 6 },
+		{ i: "table", x: 8, y: 12, w: 4, h: 6 },
+	],
+	md: [
+		{ i: "watchlist", x: 0, y: 0, w: 6, h: 8 },
+		{ i: "backtest", x: 6, y: 0, w: 6, h: 6 },
+		{ i: "graph", x: 0, y: 8, w: 8, h: 10 },
+		{ i: "table", x: 8, y: 8, w: 4, h: 10 },
+	],
+	sm: [
+		{ i: "watchlist", x: 0, y: 0, w: 12, h: 6 },
+		{ i: "backtest", x: 0, y: 6, w: 12, h: 5 },
+		{ i: "graph", x: 0, y: 11, w: 12, h: 10 },
+		{ i: "table", x: 0, y: 21, w: 12, h: 10 },
+	],
+	xs: [
+		{ i: "watchlist", x: 0, y: 0, w: 12, h: 5 },
+		{ i: "backtest", x: 0, y: 5, w: 12, h: 5 },
+		{ i: "graph", x: 0, y: 10, w: 12, h: 8 },
+		{ i: "table", x: 0, y: 18, w: 12, h: 8 },
+	],
+};
 
 function App() {
 	const [ticker, setTicker] = useState("");
@@ -113,6 +147,7 @@ function App() {
 	const [loadingStockData, setLoadingStockData] = useState(false);
 	const [watchlist, setWatchlist] = useState<string[]>([]);
   	const [widgets, setWidgets] = useState<Widget[]>(defaultWidgets);
+	const [layouts, setLayouts] = useState<{ [key: string]: Layout[] }>(defaultLayouts);
 
 	const fetchStockData = async (event: React.FormEvent) => {
 		event.preventDefault();
@@ -199,49 +234,66 @@ function App() {
 		stockData,
 	};
 
-	const layouts = {
-		lg: [
-			{ i: "watchlist", x: 0, y: 0, w: 1, h: 4 },
-			{ i: "backtest", x: 1, y: 0, w: 1, h: 4 },
-			{ i: "graph", x: 2, y: 0, w: 2, h: 8 },
-			{ i: "table", x: 0, y: 4, w: 2, h: 8 },
-		],
-		md: [
-			{ i: "watchlist", x: 0, y: 0, w: 1, h: 4 },
-			{ i: "backtest", x: 1, y: 0, w: 1, h: 4 },
-			{ i: "graph", x: 0, y: 4, w: 2, h: 8 },
-			{ i: "table", x: 0, y: 12, w: 2, h: 8 },
-		],
-		sm: [
-			{ i: "watchlist", x: 0, y: 0, w: 2, h: 4 },
-			{ i: "backtest", x: 0, y: 4, w: 2, h: 4 },
-			{ i: "graph", x: 0, y: 8, w: 2, h: 8 },
-			{ i: "table", x: 0, y: 16, w: 2, h: 8 },
-		],
-		xs: [
-			{ i: "watchlist", x: 0, y: 0, w: 1, h: 4 },
-			{ i: "backtest", x: 0, y: 4, w: 1, h: 4 },
-			{ i: "graph", x: 0, y: 8, w: 1, h: 8 },
-			{ i: "table", x: 0, y: 16, w: 1, h: 8 },
-		],
+	const getDefaultSize = () => {
+		return { w: 4, h: 8 };
 	};
+
+	const onLayoutChange = (currentLayout: Layout[], allLayouts: { [key: string]: Layout[] }) => {
+        setLayouts(layouts);
+    };
+
+	
+	const visibleWidgets = widgets.filter((w) => w.visible).sort((a, b) => a.position - b.position);
+
+    // Handle layout updates when widget visibility changes
+    useEffect(() => {
+        const visibleWidgetIds = visibleWidgets.map(w => w.id);
+        
+        setLayouts(prevLayouts => {
+            const newLayouts = { ...prevLayouts };
+            
+            Object.keys(newLayouts).forEach(breakpoint => {
+                const currentLayout = newLayouts[breakpoint];
+                
+                // Remove layouts for invisible widgets
+                const filteredLayout = currentLayout.filter(widget => visibleWidgetIds.includes(widget.i));
+				const filteredLayoutIds = new Set(filteredLayout.map(widget => widget.i));
+
+                // Add layouts for newly visible widgets
+                visibleWidgetIds.forEach(widgetId => {
+                    if (!filteredLayoutIds.has(widgetId)) {
+						// Create new layout at the bottom
+						const maxY = filteredLayout.reduce((max, item) => 
+							(item.y + item.h > max ? item.y + item.h : max), 0
+						);
+						const widget = widgets.find(w => w.id === widgetId);
+						const defaultSize = getDefaultSize();
+						filteredLayout.push({
+							i: widgetId,
+							x: 0,
+							y: maxY,
+							w: defaultSize.w,
+							h: defaultSize.h,
+						});
+					}
+                });
+                
+                newLayouts[breakpoint] = filteredLayout;
+            });
+            return newLayouts;
+        });
+    }, [widgets]); // React to changes in widgets array
 
 	const toggleWidget = (widgetId: string) => {
 		setWidgets((prev) =>
-			prev.map((widget) =>
-				widget.id === widgetId
-					? { ...widget, visible: !widget.visible }
-					: widget
-			)
+			prev.map((widget) => {
+				if (widget.id === widgetId) {
+					return { ...widget, visible: !widget.visible };
+				}
+				return widget;
+			})
 		);
 	};
-
-	const navbarProps: NavbarProps = {
-		widgets,
-		toggleWidget,
-	};
-
-	const visibleWidgets = widgets.filter((w) => w.visible).sort((a, b) => a.position - b.position);
 
 	const renderWidget = (widget: Widget) => {
 		switch (widget.type) {
@@ -256,6 +308,11 @@ function App() {
 		}
 	}
 
+	const navbarProps: NavbarProps = {
+		widgets,
+		toggleWidget,
+	};
+
 	return (
 		<div className="min-h-screen">
 			<Navbar {...navbarProps} />
@@ -263,14 +320,14 @@ function App() {
 				<ResponsiveReactGridLayout
 					className="layout"
 					layouts={layouts}
+					onLayoutChange={onLayoutChange}
 					breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-					cols={{ lg: 4, md: 2, sm: 2, xs: 1, xxs: 1 }}
+					cols={{ lg: 12, md: 4, sm: 4, xs: 2, xxs: 2 }}
 					rowHeight={30}
 					isDraggable={true}
 					isResizable={true}
 					margin={[16, 16]}
-					compactType={null}
-					preventCollision={true}
+					verticalCompact={true}
 				>
 					{visibleWidgets.map((widget) => (
 						<div
