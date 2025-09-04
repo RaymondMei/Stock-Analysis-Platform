@@ -335,6 +335,7 @@ function App() {
 					rowHeight={30}
 					isDraggable={true}
 					isResizable={true}
+					resizeHandles={['se']}
 					margin={[16, 16]}
 					verticalCompact={true}
 				>
