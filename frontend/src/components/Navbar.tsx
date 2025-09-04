@@ -51,23 +51,25 @@ const Navbar = (
 	};
 
 	return (
-		<nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-			<div className="container flex h-16 items-center px-4">
+		<nav className="border-b bg-background sticky top-0 z-50">
+			<div className="container flex h-16 items-center px-4 gap-2">
 				{/* Logo and Title */}
-				<div className="flex items-center space-x-2 mr-8">
-					<TrendingUp className="h-6 w-6 text-primary" />
-					<span className="font-bold text-xl">Stock Analysis Platform</span>
+				<div className="flex items-center space-x-2 flex-shrink-0">
+					<TrendingUp className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+					<span className="font-bold text-base sm:text-lg md:text-xl truncate max-w-[120px] sm:max-w-none">
+						Stock Analysis Platform
+					</span>
 				</div>
 
-				{/* Search section - positioned left */}
-				<div className="flex-1">
+				{/* Search section - responsive */}
+				<div className="flex-1 min-w-0 mx-2 md:mx-4">
 					<Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
 						<DialogTrigger asChild>
-							<div className="relative max-w-md">
+							<div className="relative w-full max-w-sm md:max-w-md">
 								<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 								<Input
 									placeholder="Search stocks..."
-									className="pl-10 w-96 cursor-pointer"
+									className="pl-10 w-full cursor-pointer text-sm md:text-base"
 									readOnly
 								/>
 							</div>
@@ -136,12 +138,13 @@ const Navbar = (
 				</div>
 
 				{/* Right section with customize button */}
-				<div className="ml-auto">
+				<div className="flex-shrink-0">
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-						<Button variant="outline" size="sm">
-							<Settings className="h-4 w-4 mr-2" />
-							Customize
+						<Button variant="outline" size="sm" className="text-xs md:text-sm">
+							<Settings className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
+							<span className="hidden sm:inline">Customize</span>
+							<span className="sm:hidden">•••</span>
 						</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end" className="w-56">
