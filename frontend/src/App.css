@@ -1,60 +1,95 @@
 /* Grid Layout Styles */
 .react-grid-layout {
-  position: relative;
+	position: relative;
 }
 
 .react-grid-item {
-  transition: all 200ms ease;
-  transition-property: left, top;
-  border-radius: 8px;
-  overflow: hidden;
+	transition: all 200ms ease;
+	transition-property: left, top;
+	border-radius: 8px;
+	overflow: hidden;
 }
 
 .react-grid-item.cssTransforms {
-  transition-property: transform;
+	transition-property: transform;
 }
 
 .react-grid-item > .react-resizable-handle {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  bottom: 0;
-  right: 0;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M20,20 L20,14 L14,20 Z" fill="%23cccccc"/></svg>');
-  background-repeat: no-repeat;
-  background-origin: content-box;
-  box-sizing: border-box;
-  cursor: se-resize;transition: all 0.2s ease-in-out;
-  opacity: 0;
-  z-index: 10;
+	position: absolute;
+	width: 20px;
+	height: 20px;
+	bottom: 0;
+	right: 0;
+	background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M20,20 L20,14 L14,20 Z" fill="%23cccccc"/></svg>');
+	background-repeat: no-repeat;
+	background-origin: content-box;
+	box-sizing: border-box;
+	cursor: se-resize;
+	transition: all 0.2s ease-in-out;
+	opacity: 0;
+	z-index: 10;
 }
 
 .react-grid-item:hover .react-resizable-handle {
-  opacity: 1;
+	opacity: 1;
 }
 
 .react-grid-item > .react-resizable-handle::after {
-  content: "";
-  position: absolute;
-  right: 3px;
-  bottom: 3px;
-  width: 5px;
-  height: 5px;
-  border-right: 2px solid rgba(0, 0, 0, 0.4);
-  border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+	content: "";
+	position: absolute;
+	right: 3px;
+	bottom: 3px;
+	width: 5px;
+	height: 5px;
+	border-right: 2px solid rgba(0, 0, 0, 0.4);
+	border-bottom: 2px solid rgba(0, 0, 0, 0.4);
 }
 
 /* Card container styles */
 .grid-card {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
+	height: 100%;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+}
+
+.grid-card.drag-handle {
+	cursor: move;
+}
+
+.grid-card.drag-handle > * {
+	cursor: default;
+	pointer-events: auto;
 }
 
 .grid-card > * {
-  flex: 1;
-  overflow: auto;
+	flex: 1;
+	overflow: auto;
+}
+
+/* Drag handle styles */
+.drag-handle {
+	cursor: move;
+}
+
+/* Drag placeholder - only show behind the dragged item */
+.react-grid-item.react-grid-placeholder {
+	background: rgba(59, 130, 246, 0.1) !important;
+	border: 2px dashed rgba(59, 130, 246, 0.3) !important;
+	border-radius: 8px !important;
+	opacity: 0.8 !important;
+	transition: none !important;
+}
+
+/* Hide the default red drag styling */
+.react-grid-item.react-draggable-dragging {
+	opacity: 0.8;
+}
+
+.react-grid-item.react-draggable-dragging .grid-card {
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+	transform: rotate(2deg);
 }
 
 /* #root {
