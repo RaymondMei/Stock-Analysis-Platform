@@ -21,6 +21,9 @@ import WatchlistCard from "./components/cards/WatchlistCard";
 import StockDetailPage, {
 	StockDetailPageProps,
 } from "./components/pages/StockDetailPage";
+import TopMoversCard from "./components/cards/TopMoversCard";
+import MarketNewsCard from "./components/cards/MarketNewsCard";
+import EconomicCalenderCard from "./components/cards/EconomicCalenderCard";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -152,10 +155,10 @@ const defaultWidgets: Widget[] = [
 
 const defaultLayouts: { [key: string]: Layout[] } = {
 	lg: [
-		{ i: "watchlist", x: 0, y: 0, w: 6, h: 12 },
-		{ i: "graph", x: 6, y: 0, w: 6, h: 12 },
-		{ i: "backtest", x: 0, y: 12, w: 8, h: 6 },
-		{ i: "table", x: 8, y: 12, w: 4, h: 6 },
+		{ i: "watchlist", x: 0, y: 0, w: 8, h: 14 },
+		{ i: "graph", x: 8, y: 0, w: 4, h: 6 },
+		{ i: "backtest", x: 8, y: 6, w: 2, h: 8 },
+		{ i: "table", x: 10, y: 6, w: 2, h: 8 },
 	],
 	md: [
 		{ i: "watchlist", x: 0, y: 0, w: 6, h: 8 },
@@ -398,12 +401,14 @@ function App() {
 		switch (widget.type) {
 			case "watchlist":
 				return <WatchlistCard {...watchlistCardProps} />;
-			case "backtest":
-				return <BacktestCard {...backtestCardProps} />;
 			case "graph":
-				return <StockGraphCard {...stockGraphCardProps} />;
+				// return <BacktestCard {...backtestCardProps} />;
+				return <MarketNewsCard />;
+			case "backtest":
+				// return <StockGraphCard {...stockGraphCardProps} />;
+				return <TopMoversCard />;
 			case "table":
-				return <StockTableCard {...stockTableCardProps} />;
+				return <EconomicCalenderCard />;
 		}
 	};
 
@@ -455,7 +460,7 @@ function App() {
 					{visibleWidgets.map((widget) => (
 						<div
 							key={widget.id}
-							className="grid-card bg-white rounded-lg shadow-md"
+							className="grid-card bg-white rounded-lg shadow-md drag-handle"
 						>
 							{renderWidget(widget)}
 						</div>

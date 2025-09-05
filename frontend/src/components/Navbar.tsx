@@ -47,7 +47,7 @@ const Navbar = ({
 	addToWatchlist,
 }: NavbarProps) => {
 	return (
-		<nav className="border-b bg-background sticky top-0 z-50">
+		<nav className="border-b bg-white sticky top-0 z-50">
 			<div className="container flex h-16 items-center px-4 gap-2">
 				{/* Logo and Title */}
 				<div className="flex items-center space-x-2 flex-shrink-0">
