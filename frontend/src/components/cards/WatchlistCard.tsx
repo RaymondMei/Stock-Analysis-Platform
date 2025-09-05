@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { BarChart3, Plus, TrendingUp, TrendingDown, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useEffect } from "react";
 
 export interface WatchlistCardProps {
 	setIsAddDialogOpen: (isOpen: boolean) => void;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import "./App.css";
@@ -280,6 +280,17 @@ function App() {
 	//   ],
 	// };
 
+	const addToWatchlist = (stock: StockQuote) => {
+		setWatchlist((prev) => {
+			if (prev.find((s) => s.symbol === stock.symbol)) {
+				toast(`${stock.symbol} is already in your watchlist`);
+				return prev;
+			}
+			toast(`Added ${stock.symbol} to your watchlist`);
+			return [...prev, stock];
+		});
+	};
+
 	const removeFromWatchlist = (symbol: string) => {
 		setWatchlist((prev) => prev.filter((stock) => stock.symbol !== symbol));
 	};
@@ -417,21 +428,9 @@ function App() {
 		toggleWidget,
 		isAddDialogOpen,
 		setIsAddDialogOpen,
-		resetLayout: () => {
-			console.log("Resetting layout to default");
-			setLayouts(defaultLayouts);
-		},
+		resetLayout: () => setLayouts(defaultLayouts),
 		watchlist,
-		addToWatchlist: (stock: StockQuote) => {
-			setWatchlist((prev) => {
-				if (prev.find((s) => s.symbol === stock.symbol)) {
-					toast(`${stock.symbol} is already in your watchlist`);
-					return prev;
-				}
-				toast(`Added ${stock.symbol} to your watchlist`);
-				return [...prev, stock];
-			});
-		},
+		addToWatchlist,
 	};
 
 	if (selectedStock) {
@@ -460,7 +459,7 @@ function App() {
 					{visibleWidgets.map((widget) => (
 						<div
 							key={widget.id}
-							className="grid-card bg-white rounded-lg shadow-md drag-handle"
+							className="grid-card bg-white rounded-lg shadow-md"
 						>
 							{renderWidget(widget)}
 						</div>

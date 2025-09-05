@@ -11,7 +11,18 @@ import { Button } from "../ui/button";
 import { DialogHeader } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { StockQuote } from "@/App";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import fetchStockResults from "../services/fetchStockResults";
+import { toast } from "sonner";
+import fetchStockQuote from "../services/fetchStockQuote";
+
+export interface StockSearchResult {
+	symbol: string;
+	name: string;
+	type: string;
+	region: string;
+	currency: string;
+}
 
 export interface AddWatchlistStockDialogProps {
 	isAddDialogOpen: boolean;
@@ -27,8 +38,41 @@ const AddWatchlistStockDialog = ({
 	addToWatchlist,
 }: AddWatchlistStockDialogProps) => {
 	const [searchQuery, setSearchQuery] = useState("");
-	const [searchResults, setSearchResults] = useState<StockQuote[]>([]);
+	const [searchResults, setSearchResults] = useState<StockSearchResult[]>([]);
 	const [isSearching, setIsSearching] = useState(false);
+
+	const debouncedSearch = useCallback(
+		async (query: string) => {
+			if (query.length < 2) {
+				setSearchResults([]);
+				return;
+			}
+
+			setIsSearching(true);
+			try {
+				const results: StockSearchResult[] = await fetchStockResults(query);
+				setSearchResults(results);
+			} catch (error) {
+				toast(`${error}` || "Error searching stocks");
+			} finally {
+				setIsSearching(false);
+			}
+		},
+		[toast]
+	);
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			debouncedSearch(searchQuery);
+		}, 300);
+
+		return () => clearTimeout(timer);
+	}, [searchQuery, debouncedSearch]);
+
+	const handleAddToWatchlist = async (result: StockSearchResult) => {
+		const stockToAdd: StockQuote = await fetchStockQuote(result.symbol);
+		addToWatchlist(stockToAdd);
+	};
 
 	return (
 		<Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -93,7 +137,7 @@ const AddWatchlistStockDialog = ({
 									</div>
 									<Button
 										size="sm"
-										onClick={() => addToWatchlist(result)}
+										onClick={() => handleAddToWatchlist(result)}
 										disabled={watchlist.some(
 											(stock) => stock.symbol === result.symbol
 										)}
