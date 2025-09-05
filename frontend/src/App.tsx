@@ -13,7 +13,7 @@ import StockTableCard, {
 import StockGraphCard, {
 	StockGraphCardProps,
 } from "./components/StockGraphCard";
-import BacktestCard, { BacktestCardProps } from "./components/BacktestCard";
+// import BacktestCard, { BacktestCardProps } from "./components/OldBacktestCard";
 import Navbar, { NavbarProps } from "./components/Navbar";
 
 import { Responsive, WidthProvider } from "react-grid-layout";
@@ -24,6 +24,9 @@ import StockDetailPage, {
 import TopMoversCard from "./components/cards/TopMoversCard";
 import MarketNewsCard from "./components/cards/MarketNewsCard";
 import EconomicCalenderCard from "./components/cards/EconomicCalenderCard";
+import BacktestCard, {
+	BacktestCardProps,
+} from "./components/cards/BacktestCard";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -203,6 +206,7 @@ function App() {
 	const [widgets, setWidgets] = useState<Widget[]>(defaultWidgets);
 	const [layouts, setLayouts] = useState(defaultLayouts);
 	const [isManualLayoutChange, setIsManualLayoutChange] = useState(false);
+	const [showBacktest, setShowBacktest] = useState(false);
 	const [watchlist, setWatchlist] = useState<StockQuote[]>([
 		{
 			symbol: "AAPL",
@@ -317,16 +321,16 @@ function App() {
 		removeFromWatchlist,
 	};
 
-	const backtestCardProps: BacktestCardProps = {
-		initialInvestment,
-		setInitialInvestment,
-		shortWindow,
-		setShortWindow,
-		longWindow,
-		setLongWindow,
-		backtestResults,
-		runBacktest,
-	};
+	// const backtestCardProps: BacktestCardProps = {
+	// 	initialInvestment,
+	// 	setInitialInvestment,
+	// 	shortWindow,
+	// 	setShortWindow,
+	// 	longWindow,
+	// 	setLongWindow,
+	// 	backtestResults,
+	// 	runBacktest,
+	// };
 
 	const stockGraphCardProps: StockGraphCardProps = {
 		loadingStockData,
@@ -440,7 +444,22 @@ function App() {
 		resetLayout: () => setLayouts(defaultLayouts),
 		watchlist,
 		addToWatchlist,
+		setShowBacktest,
 	};
+
+	const backtestCardProps: BacktestCardProps = {
+		onBack: () => setShowBacktest(false),
+	};
+
+	if (showBacktest) {
+		return (
+			<div className="min-h-screen bg-background">
+				<div className="container mx-auto px-4 py-6">
+					<BacktestCard {...backtestCardProps} />
+				</div>
+			</div>
+		);
+	}
 
 	if (selectedStock) {
 		return (
