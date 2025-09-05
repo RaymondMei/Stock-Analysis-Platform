@@ -114,6 +114,15 @@ export interface StockQuote {
 	marketCap?: number;
 }
 
+export interface StockHistoricalData {
+	date: string;
+	open: number;
+	high: number;
+	low: number;
+	close: number;
+	volume: number;
+}
+
 const defaultWidgets: Widget[] = [
 	//   { id: "watchlist", type: "watchlist", title: "My Watchlist", visible: true, position: 0 },
 	//   { id: "market-overview", type: "market-overview", title: "Market Overview", visible: true, position: 1 },
@@ -434,7 +443,13 @@ function App() {
 	};
 
 	if (selectedStock) {
-		return <StockDetailPage {...stockDetailPageProps} />;
+		return (
+			<div className="min-h-screen bg-background">
+				<div className="container mx-auto px-4 py-6">
+					<StockDetailPage {...stockDetailPageProps} />
+				</div>
+			</div>
+		);
 	}
 
 	return (

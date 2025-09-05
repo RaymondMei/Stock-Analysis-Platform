@@ -104,18 +104,44 @@ def getStockQuote(request):
 		
 		if is_valid_ticker(info):
 			return JsonResponse({
-				'symbol': info.get('symbol', query.upper()),
-				'name': info.get('longName', info.get('shortName', '')),
-				'price': info.get('regularMarketPrice', 0.0),
-				'change': info.get('regularMarketChange', 0.0),
-				'percent_change': info.get('regularMarketChangePercent', 0.0),
-				'volume': info.get('regularMarketVolume', 0),
-				'marketCap': info.get('marketCap', 0),
-				'time': dt.fromtimestamp(info.get('regularMarketTime', 0)).isoformat() if info.get('regularMarketTime') else '',
+				'quote': {
+					'symbol': info.get('symbol', query.upper()),
+					'name': info.get('longName', info.get('shortName', '')),
+					'price': info.get('regularMarketPrice', 0.0),
+					'change': info.get('regularMarketChange', 0.0),
+					'percent_change': info.get('regularMarketChangePercent', 0.0),
+					'volume': info.get('regularMarketVolume', 0),
+					'marketCap': info.get('marketCap', 0),
+					'time': dt.fromtimestamp(info.get('regularMarketTime', 0)).isoformat() if info.get('regularMarketTime') else '',
+				}
 			})
 		else:
 			return JsonResponse({'error': f'Invalid ticker symbol \"{query.upper()}\"'}, status=404)
 			
+	except Exception as e:
+		print(f"Exception occurred: {e}")
+		return JsonResponse({'error': str(e)}, status=500)
+	
+def getStockHistoricalData(request):
+	symbol = request.GET.get('symbol', '')
+	period = request.GET.get('period', '1mo')  # Default to 1 month
+	print(f"Getting historical data for: {symbol} over period: {period}")
+	if not symbol:
+		return JsonResponse({'error': 'Symbol parameter required'}, status=400)
+	try:
+		ticker = yfin.Ticker(symbol.upper())
+		history = ticker.history(period=period)
+		if history.empty:
+			return JsonResponse({'error': f'No historical data found for symbol \"{symbol.upper()}\"'}, status=404)
+		
+		history.reset_index(inplace=True)
+		history['Date'] = history['Date'].dt.strftime('%Y-%m-%d')
+		
+		# Rename columns to lowercase
+		history.columns = history.columns.str.lower()
+		historical_data = history[['date', 'open', 'high', 'low', 'close', 'volume']].to_dict(orient='records')
+
+		return JsonResponse({'historical_data': historical_data})
 	except Exception as e:
 		print(f"Exception occurred: {e}")
 		return JsonResponse({'error': str(e)}, status=500)

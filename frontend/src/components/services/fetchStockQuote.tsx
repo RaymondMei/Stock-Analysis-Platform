@@ -33,7 +33,7 @@ const fetchStockQuote = async (query: string): Promise<StockQuote> => {
 		if ("error" in data) {
 			throw new Error(data.error);
 		}
-		return mapToStockQuote(data);
+		return mapToStockQuote(data.quote);
 	} catch (error) {
 		console.error("Error searching stocks:", error);
 		throw error;
