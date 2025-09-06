@@ -150,7 +150,6 @@ export function StockDetailPage({ symbol, onBack }: StockDetailPageProps) {
 	// Custom candlestick bar component
 	const CandlestickBar = (props: any) => {
 		const { payload, x, y, width, height } = props;
-		console.log("Candlestick payload:", payload, x, y, width, height);
 		if (!payload) return <g />;
 
 		const { open, close, high, low } = payload;

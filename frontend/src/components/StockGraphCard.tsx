@@ -22,7 +22,6 @@ const StockGraphCard = ({
 		const handleResize = () => {
 			setWidth(componentRef.current?.offsetWidth ?? 0);
 			setHeight(componentRef.current?.offsetHeight ?? 0);
-			console.log("Resizing StockGraphCard", width, height);
 		};
 
 		handleResize(); // Set initial size

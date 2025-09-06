@@ -151,6 +151,15 @@ const BacktestCard = ({ onBack }: BacktestCardProps) => {
 					trades++;
 				}
 			}
+			// Buy & Hold Strategy
+			else if (strategyType === "buy_hold" && i === 0) {
+				// Buy everything on the first day
+				shares = Math.floor(cash / price);
+				cash = cash - shares * price;
+				position = 1;
+				trades = 1;
+				lastTradePrice = price;
+			}
 
 			portfolioValue = cash + shares * price;
 			maxPortfolioValue = Math.max(maxPortfolioValue, portfolioValue);
@@ -190,7 +199,14 @@ const BacktestCard = ({ onBack }: BacktestCardProps) => {
 			) * Math.sqrt(252);
 		const sharpeRatio = volatility > 0 ? annualizedReturn / volatility : 0;
 		const maxDrawdown = Math.max(...results.map((r) => r.drawdown));
-		const winRate = trades > 0 ? winningTrades / trades : 0;
+
+		// For buy & hold, win rate is based on whether the final value is higher than initial
+		let winRate = 0;
+		if (strategyType === "buy_hold") {
+			winRate = totalReturn > 0 ? 1 : 0;
+		} else {
+			winRate = trades > 0 ? winningTrades / trades : 0;
+		}
 
 		return {
 			results,
@@ -482,9 +498,10 @@ const BacktestCard = ({ onBack }: BacktestCardProps) => {
 												<Line
 													type="monotone"
 													dataKey="portfolioValue"
-													stroke="hsl(var(--primary))"
-													strokeWidth={2}
+													stroke="#3b82f6"
+													strokeWidth={3}
 													dot={false}
+													activeDot={{ r: 6, fill: "#3b82f6" }}
 												/>
 											</LineChart>
 										</ResponsiveContainer>
@@ -525,9 +542,10 @@ const BacktestCard = ({ onBack }: BacktestCardProps) => {
 												<Line
 													type="monotone"
 													dataKey="cumulativeReturns"
-													stroke="hsl(var(--chart-2))"
-													strokeWidth={2}
+													stroke="#10b981"
+													strokeWidth={3}
 													dot={false}
+													activeDot={{ r: 6, fill: "#10b981" }}
 												/>
 											</LineChart>
 										</ResponsiveContainer>
@@ -568,9 +586,10 @@ const BacktestCard = ({ onBack }: BacktestCardProps) => {
 												<Line
 													type="monotone"
 													dataKey="drawdown"
-													stroke="hsl(var(--destructive))"
-													strokeWidth={2}
+													stroke="#ef4444"
+													strokeWidth={3}
 													dot={false}
+													activeDot={{ r: 6, fill: "#ef4444" }}
 												/>
 											</LineChart>
 										</ResponsiveContainer>
