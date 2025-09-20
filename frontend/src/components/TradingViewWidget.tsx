@@ -1,16 +1,15 @@
-// TradingViewWidget.jsx
-import React, { useEffect, useRef, memo } from 'react';
+import { useEffect, useRef, memo } from "react";
 
 function TradingViewWidget() {
-  const container = useRef<HTMLDivElement>(null);
+	const container = useRef<HTMLDivElement>(null);
 
-  useEffect(
-    () => {
-      const script = document.createElement("script");
-      script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
-      script.type = "text/javascript";
-      script.async = true;
-      script.innerHTML = `
+	useEffect(() => {
+		const script = document.createElement("script");
+		script.src =
+			"https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+		script.type = "text/javascript";
+		script.async = true;
+		script.innerHTML = `
         {
           "allow_symbol_change": true,
           "calendar": false,
@@ -35,22 +34,38 @@ function TradingViewWidget() {
           "studies": [],
           "autosize": true
         }`;
-        if (container.current) {
-          container.current.innerHTML = ''; // Clear previous content
-          container.current.appendChild(script);
-        }
-    },
-    []
-  );
+		if (container.current) {
+			container.current.innerHTML = ""; // Clear previous content
+			container.current.appendChild(script);
+		}
+	}, []);
 
-  return (
-    <div className="tradingview-widget-container" ref={container} style={{ height: "100%", width: "100%",
-        minHeight: "400px",
-        minWidth: "600px" }}>
-      <div className="tradingview-widget-container__widget" style={{ height: "calc(100% - 32px)", width: "100%" }}></div>
-      <div className="tradingview-widget-copyright"><a href="https://www.tradingview.com/symbols/NASDAQ-AAPL/?exchange=NASDAQ" rel="noopener nofollow" target="_blank"><span className="blue-text">AAPL chart by TradingView</span></a></div>
-    </div>
-  );
+	return (
+		<div
+			className="tradingview-widget-container"
+			ref={container}
+			style={{
+				height: "100%",
+				width: "100%",
+				minHeight: "400px",
+				minWidth: "600px",
+			}}
+		>
+			<div
+				className="tradingview-widget-container__widget"
+				style={{ height: "calc(100% - 32px)", width: "100%" }}
+			></div>
+			<div className="tradingview-widget-copyright">
+				<a
+					href="https://www.tradingview.com/symbols/NASDAQ-AAPL/?exchange=NASDAQ"
+					rel="noopener nofollow"
+					target="_blank"
+				>
+					<span className="blue-text">AAPL chart by TradingView</span>
+				</a>
+			</div>
+		</div>
+	);
 }
 
 export default memo(TradingViewWidget);

@@ -2,7 +2,7 @@ import { Clock } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-const EconomicCalenderCard = () => {
+const EconomicCalendarCard = () => {
 	return (
 		<Card className="h-full">
 			<CardHeader>
@@ -46,4 +46,4 @@ const EconomicCalenderCard = () => {
 	);
 };
 
-export default EconomicCalenderCard;
+export default EconomicCalendarCard;

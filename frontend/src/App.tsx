@@ -1,39 +1,30 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import "./App.css";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import FetchStockCard, {
-	FetchStockCardProps,
-} from "./components/FetchStockCard";
-import StockTableCard, {
-	StockTableCardProps,
-} from "./components/StockTableCard";
-import StockGraphCard, {
-	StockGraphCardProps,
-} from "./components/StockGraphCard";
-// import BacktestCard, { BacktestCardProps } from "./components/OldBacktestCard";
 import Navbar, { NavbarProps } from "./components/Navbar";
 
 import { Responsive, WidthProvider } from "react-grid-layout";
-import WatchlistCard from "./components/cards/WatchlistCard";
-import StockDetailPage, {
-	StockDetailPageProps,
-} from "./components/pages/StockDetailPage";
-import TopMoversCard from "./components/cards/TopMoversCard";
-import MarketNewsCard from "./components/cards/MarketNewsCard";
-import EconomicCalenderCard from "./components/cards/EconomicCalenderCard";
-import BacktestCard, {
-	BacktestCardProps,
-} from "./components/cards/BacktestCard";
+
+// Lazy load heavy components
+const WatchlistCard = lazy(() => import("./components/cards/WatchlistCard"));
+const StockDetailPage = lazy(
+	() => import("./components/pages/StockDetailPage")
+);
+const TopMoversCard = lazy(() => import("./components/cards/TopMoversCard"));
+const MarketNewsCard = lazy(() => import("./components/cards/MarketNewsCard"));
+const BacktestCard = lazy(() => import("./components/cards/BacktestCard"));
+const EconomicCalendarCard = lazy(
+	() => import("./components/cards/EconomicCalendarCard")
+);
+
+// Import types separately
+import type { StockDetailPageProps } from "./components/pages/StockDetailPage";
+import type { BacktestCardProps } from "./components/cards/BacktestCard";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
-
-// const apiUrl = import.meta.env.VITE_REACT_APP_API_URL ?? "http://localhost:8000";
-const apiUrl =
-	window.location.href.substring(0, window.location.href.lastIndexOf(":")) +
-	":8000";
 
 interface StockPoint {
 	open: string;
@@ -80,9 +71,6 @@ export interface BacktestResult {
 
 export type WidgetType =
 	| "watchlist"
-	| "backtest"
-	| "graph"
-	| "table"
 	| "market-overview"
 	| "quick-actions"
 	| "portfolio-summary"
@@ -127,14 +115,6 @@ export interface StockHistoricalData {
 }
 
 const defaultWidgets: Widget[] = [
-	//   { id: "watchlist", type: "watchlist", title: "My Watchlist", visible: true, position: 0 },
-	//   { id: "market-overview", type: "market-overview", title: "Market Overview", visible: true, position: 1 },
-	//   { id: "quick-actions", type: "quick-actions", title: "Quick Actions", visible: true, position: 2 },
-	//   { id: "portfolio-summary", type: "portfolio-summary", title: "Portfolio Summary", visible: true, position: 3 },
-	//   { id: "top-movers", type: "top-movers", title: "Top Movers", visible: false, position: 4 },
-	//   { id: "market-news", type: "market-news", title: "Market News", visible: false, position: 5 },
-	//   { id: "economic-calendar", type: "economic-calendar", title: "Economic Calendar", visible: false, position: 6 },
-	//   { id: "alerts", type: "alerts", title: "Price Alerts", visible: false, position: 7 },
 	{
 		id: "watchlist",
 		type: "watchlist",
@@ -143,23 +123,23 @@ const defaultWidgets: Widget[] = [
 		position: 0,
 	},
 	{
-		id: "backtest",
-		type: "backtest",
-		title: "Backtest",
+		id: "top-movers",
+		type: "top-movers",
+		title: "Top Movers",
 		visible: true,
 		position: 1,
 	},
 	{
-		id: "graph",
-		type: "graph",
-		title: "Stock Graph",
+		id: "market-news",
+		type: "market-news",
+		title: "Market News",
 		visible: true,
 		position: 2,
 	},
 	{
-		id: "table",
-		type: "table",
-		title: "Stock Table",
+		id: "economic-calendar",
+		type: "economic-calendar",
+		title: "Economic Calendar",
 		visible: true,
 		position: 3,
 	},
@@ -168,45 +148,37 @@ const defaultWidgets: Widget[] = [
 const defaultLayouts: { [key: string]: Layout[] } = {
 	lg: [
 		{ i: "watchlist", x: 0, y: 0, w: 8, h: 14 },
-		{ i: "graph", x: 8, y: 0, w: 4, h: 6 },
-		{ i: "backtest", x: 8, y: 6, w: 2, h: 8 },
-		{ i: "table", x: 10, y: 6, w: 2, h: 8 },
+		{ i: "market-news", x: 8, y: 0, w: 4, h: 6 },
+		{ i: "top-movers", x: 8, y: 6, w: 2, h: 8 },
+		{ i: "economic-calendar", x: 10, y: 6, w: 2, h: 8 },
 	],
 	md: [
 		{ i: "watchlist", x: 0, y: 0, w: 6, h: 8 },
-		{ i: "backtest", x: 6, y: 0, w: 6, h: 6 },
-		{ i: "graph", x: 0, y: 8, w: 8, h: 10 },
-		{ i: "table", x: 8, y: 8, w: 4, h: 10 },
+		{ i: "top-movers", x: 6, y: 0, w: 6, h: 6 },
+		{ i: "market-news", x: 0, y: 8, w: 8, h: 10 },
+		{ i: "economic-calendar", x: 8, y: 8, w: 4, h: 10 },
 	],
 	sm: [
 		{ i: "watchlist", x: 0, y: 0, w: 12, h: 6 },
-		{ i: "backtest", x: 0, y: 6, w: 12, h: 5 },
-		{ i: "graph", x: 0, y: 11, w: 12, h: 10 },
-		{ i: "table", x: 0, y: 21, w: 12, h: 10 },
+		{ i: "top-movers", x: 0, y: 6, w: 12, h: 5 },
+		{ i: "market-news", x: 0, y: 11, w: 12, h: 10 },
+		{ i: "economic-calendar", x: 0, y: 21, w: 12, h: 10 },
 	],
 	xs: [
 		{ i: "watchlist", x: 0, y: 0, w: 12, h: 5 },
-		{ i: "backtest", x: 0, y: 5, w: 12, h: 5 },
-		{ i: "graph", x: 0, y: 10, w: 12, h: 8 },
-		{ i: "table", x: 0, y: 18, w: 12, h: 8 },
+		{ i: "top-movers", x: 0, y: 5, w: 12, h: 5 },
+		{ i: "market-news", x: 0, y: 10, w: 12, h: 8 },
+		{ i: "economic-calendar", x: 0, y: 18, w: 12, h: 8 },
 	],
 };
 
 function App() {
-	const [symbol, setSymbol] = useState("");
-	const [stockData, setStockData] = useState<StockData | undefined>();
-	const [initialInvestment, setInitialInvestment] = useState<
-		number | undefined
-	>();
-	const [shortWindow, setShortWindow] = useState<number | undefined>();
-	const [longWindow, setLongWindow] = useState<number | undefined>();
-	const [backtestResults, setBacktestResults] = useState<BacktestResult>();
-	const [loadingStockData, setLoadingStockData] = useState(false);
 	const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 	const [widgets, setWidgets] = useState<Widget[]>(defaultWidgets);
 	const [layouts, setLayouts] = useState(defaultLayouts);
 	const [isManualLayoutChange, setIsManualLayoutChange] = useState(false);
 	const [showBacktest, setShowBacktest] = useState(false);
+	const [isDraggableMode, setIsDraggableMode] = useState(false);
 	const [watchlist, setWatchlist] = useState<StockQuote[]>([
 		{
 			symbol: "AAPL",
@@ -235,64 +207,6 @@ function App() {
 	]);
 	const [selectedStock, setSelectedStock] = useState<string | null>(null);
 
-	const fetchStockData = async (event: React.FormEvent) => {
-		event.preventDefault();
-		setLoadingStockData(true);
-		try {
-			const response = await fetch(
-				`${apiUrl}/stockhistory?ticker=${symbol}`
-				// `http://3.84.181.13:8000/stockhistory?ticker=${symbol}`
-			);
-			const data = await response.json();
-			if ("error" in data) {
-				setStockData(undefined);
-				toast(`Error fetching stock data: ${data["error"]}`);
-			} else {
-				setStockData(data);
-			}
-		} catch (error) {
-			setStockData(undefined);
-			toast(`Error fetching stock data: ${error}`);
-		}
-		setLoadingStockData(false);
-	};
-
-	const runBacktest = async (event: React.FormEvent) => {
-		event.preventDefault();
-		try {
-			const response = await fetch(
-				`${apiUrl}/simplemovingaverage?ticker=${symbol}&initialInvestment=${
-					initialInvestment ?? 1000
-				}&shortWindow=${shortWindow ?? 10}&longWindow=${longWindow ?? 20}`
-				// `http://3.84.181.13:8000/simplemovingaverage?ticker=${symbol}&initialInvestment=${
-				// 	initialInvestment ?? 1000
-				// }&shortWindow=${shortWindow ?? 10}&longWindow=${longWindow ?? 20}`
-			);
-			const data = await response.json();
-			if ("error" in data) {
-				setBacktestResults(undefined);
-				toast(`Error running backtest: ${data["error"]}`);
-			} else {
-				setBacktestResults(data as BacktestResult);
-			}
-		} catch (error) {
-			setBacktestResults(undefined);
-			toast(`Error running backtest: ${error}`);
-		}
-	};
-
-	// const chartData = {
-	//   labels: stockData.map((data) => data.date),
-	//   datasets: [
-	//     {
-	//       label: "Stock Price",
-	//       data: stockData.map((data) => data.close),
-	//       borderColor: "rgba(75,192,192,1)",
-	//       fill: false,
-	//     },
-	//   ],
-	// };
-
 	const addToWatchlist = (stock: StockQuote) => {
 		setWatchlist((prev) => {
 			if (prev.find((s) => s.symbol === stock.symbol)) {
@@ -308,38 +222,11 @@ function App() {
 		setWatchlist((prev) => prev.filter((stock) => stock.symbol !== symbol));
 	};
 
-	const fetchStockCardProps: FetchStockCardProps = {
-		symbol,
-		setSymbol,
-		fetchStockData,
-	};
-
 	const watchlistCardProps = {
 		setIsAddDialogOpen,
 		watchlist,
 		setSelectedStock,
 		removeFromWatchlist,
-	};
-
-	// const backtestCardProps: BacktestCardProps = {
-	// 	initialInvestment,
-	// 	setInitialInvestment,
-	// 	shortWindow,
-	// 	setShortWindow,
-	// 	longWindow,
-	// 	setLongWindow,
-	// 	backtestResults,
-	// 	runBacktest,
-	// };
-
-	const stockGraphCardProps: StockGraphCardProps = {
-		loadingStockData,
-		stockData,
-	};
-
-	const stockTableCardProps: StockTableCardProps = {
-		loadingStockData,
-		stockData,
 	};
 
 	const stockDetailPageProps: StockDetailPageProps = {
@@ -352,7 +239,7 @@ function App() {
 	};
 
 	const onLayoutChange = (
-		currentLayout: Layout[],
+		_currentLayout: Layout[],
 		allLayouts: { [key: string]: Layout[] }
 	) => {
 		if (isManualLayoutChange) {
@@ -424,15 +311,29 @@ function App() {
 	const renderWidget = (widget: Widget) => {
 		switch (widget.type) {
 			case "watchlist":
-				return <WatchlistCard {...watchlistCardProps} />;
-			case "graph":
-				// return <BacktestCard {...backtestCardProps} />;
-				return <MarketNewsCard />;
-			case "backtest":
-				// return <StockGraphCard {...stockGraphCardProps} />;
-				return <TopMoversCard />;
-			case "table":
-				return <EconomicCalenderCard />;
+				return (
+					<Suspense fallback={<div className="p-4">Loading...</div>}>
+						<WatchlistCard {...watchlistCardProps} />
+					</Suspense>
+				);
+			case "market-news":
+				return (
+					<Suspense fallback={<div className="p-4">Loading...</div>}>
+						<MarketNewsCard />
+					</Suspense>
+				);
+			case "top-movers":
+				return (
+					<Suspense fallback={<div className="p-4">Loading...</div>}>
+						<TopMoversCard />
+					</Suspense>
+				);
+			case "economic-calendar":
+				return (
+					<Suspense fallback={<div className="p-4">Loading...</div>}>
+						<EconomicCalendarCard />
+					</Suspense>
+				);
 		}
 	};
 
@@ -445,6 +346,8 @@ function App() {
 		watchlist,
 		addToWatchlist,
 		setShowBacktest,
+		isDraggableMode,
+		setIsDraggableMode,
 	};
 
 	const backtestCardProps: BacktestCardProps = {
@@ -455,7 +358,15 @@ function App() {
 		return (
 			<div className="min-h-screen bg-background">
 				<div className="container mx-auto px-4 py-6">
-					<BacktestCard {...backtestCardProps} />
+					<Suspense
+						fallback={
+							<div className="flex items-center justify-center h-64">
+								Loading...
+							</div>
+						}
+					>
+						<BacktestCard {...backtestCardProps} />
+					</Suspense>
 				</div>
 			</div>
 		);
@@ -465,7 +376,15 @@ function App() {
 		return (
 			<div className="min-h-screen bg-background">
 				<div className="container mx-auto px-4 py-6">
-					<StockDetailPage {...stockDetailPageProps} />
+					<Suspense
+						fallback={
+							<div className="flex items-center justify-center h-64">
+								Loading...
+							</div>
+						}
+					>
+						<StockDetailPage {...stockDetailPageProps} />
+					</Suspense>
 				</div>
 			</div>
 		);
@@ -473,6 +392,7 @@ function App() {
 
 	return (
 		<div className="min-h-screen">
+			{/* <SpeedInsights /> */}
 			<Navbar {...navbarProps} />
 			<div className="p-4">
 				<ResponsiveReactGridLayout
@@ -493,7 +413,9 @@ function App() {
 					{visibleWidgets.map((widget) => (
 						<div
 							key={widget.id}
-							className="grid-card bg-white rounded-lg shadow-md"
+							className={`grid-card bg-white rounded-lg shadow-md ${
+								isDraggableMode ? "drag-handle" : ""
+							}`}
 						>
 							{renderWidget(widget)}
 						</div>

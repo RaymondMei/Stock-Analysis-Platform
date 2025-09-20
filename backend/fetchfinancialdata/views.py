@@ -9,6 +9,14 @@ import pandas as pd
 import numpy as np
 import yfinance as yfin
 from datetime import datetime as dt
+import time
+import random
+import warnings
+
+# Configure yfinance for better reliability (new in 0.2.66)
+import yfinance as yf
+yf.set_tz_cache_location("custom/cache/location")  # Optional: set custom cache location
+warnings.filterwarnings("ignore", category=FutureWarning)  # Suppress pandas warnings
 
 def is_valid_ticker(info_dict):
 	if not info_dict or len(info_dict) <= 1:

@@ -1,30 +1,19 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
 	Eye,
 	EyeOff,
+	Move,
 	RotateCcw,
-	Search,
 	Settings,
 	Target,
 	TrendingUp,
 } from "lucide-react";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-} from "@/components/ui/dialog";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ThreeDots } from "react-loader-spinner";
 import { StockQuote, Widget } from "@/App";
 import AddWatchlistStockDialog from "./dialogs/AddWatchlistStockDialog";
 
@@ -37,6 +26,8 @@ export interface NavbarProps {
 	watchlist: StockQuote[];
 	addToWatchlist: (stock: StockQuote) => void;
 	setShowBacktest: (show: boolean) => void;
+	isDraggableMode: boolean;
+	setIsDraggableMode: (isDraggable: boolean) => void;
 }
 
 const Navbar = ({
@@ -48,6 +39,8 @@ const Navbar = ({
 	watchlist,
 	addToWatchlist,
 	setShowBacktest,
+	isDraggableMode,
+	setIsDraggableMode,
 }: NavbarProps) => {
 	return (
 		<nav className="border-b bg-white sticky top-0 z-50">
@@ -72,6 +65,19 @@ const Navbar = ({
 
 				{/* Right section with reset and customize buttons */}
 				<div className="flex items-center gap-2">
+					<Button
+						variant={isDraggableMode ? "default" : "outline"}
+						size="sm"
+						className="text-xs md:text-sm"
+						onClick={() => setIsDraggableMode(!isDraggableMode)}
+						title={isDraggableMode ? "Disable Drag Mode" : "Enable Drag Mode"}
+					>
+						<Move className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
+						<span className="hidden sm:inline">
+							{isDraggableMode ? "Stop Drag" : "Drag"}
+						</span>
+					</Button>
+
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button
